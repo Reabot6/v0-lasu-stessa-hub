@@ -23,15 +23,20 @@ export default function AdminLoginPage() {
       return;
     }
 
-    if (verifyAdmin(email, password)) {
-      const token = btoa(`${email}:${Date.now()}`);
-      setAdminSession(token);
-      router.push('/admin');
-    } else {
-      setError('Invalid email or password');
+    try {
+      const isValid = await verifyAdmin(email, password);
+      if (isValid) {
+        const token = btoa(`${email}:${Date.now()}`);
+        setAdminSession(token);
+        router.push('/admin');
+      } else {
+        setError('Invalid email or password');
+        setLoading(false);
+      }
+    } catch (err) {
+      setError('An error occurred during login. Please try again.');
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
