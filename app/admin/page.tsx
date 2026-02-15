@@ -19,8 +19,10 @@ export default function AdminPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [resources, setResources] = useState<Resource[]>([]);
   const [news, setNews] = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   // Course form
   const [courseForm, setCourseForm] = useState<Partial<Course>>({});
@@ -40,36 +42,53 @@ export default function AdminPage() {
     loadData();
   }, [router]);
 
-  const loadData = () => {
-    setCourses(getCourses());
-    setResources(getResources());
-    setNews(getNews());
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const [coursesData, resourcesData, newsData] = await Promise.all([
+        getCourses(),
+        getResources(),
+        getNews(),
+      ]);
+      setCourses(coursesData);
+      setResources(resourcesData);
+      setNews(newsData);
+    } catch (error) {
+      console.error('[v0] Error loading data:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // COURSES
-  const handleAddCourse = () => {
+  const handleAddCourse = async () => {
     if (!courseForm.title || !courseForm.code || !courseForm.department) {
       alert('Please fill in all required fields');
       return;
     }
 
-    const newCourse: Course = {
-      id: editingId || `course_${Date.now()}`,
-      title: courseForm.title || '',
-      code: courseForm.code || '',
-      department: courseForm.department || '',
-      description: courseForm.description || '',
-    };
+    try {
+      setSaving(true);
+      if (editingId) {
+        await updateCourse(editingId, courseForm as Partial<Course>);
+      } else {
+        await addCourse({
+          title: courseForm.title,
+          code: courseForm.code,
+          department: courseForm.department,
+          description: courseForm.description || '',
+        } as Omit<Course, 'id' | 'created_at' | 'updated_at'>);
+      }
 
-    if (editingId) {
-      updateCourse(editingId, newCourse);
-    } else {
-      addCourse(newCourse);
+      setCourseForm({});
+      setEditingId(null);
+      await loadData();
+    } catch (error) {
+      console.error('[v0] Error saving course:', error);
+      alert('Error saving course');
+    } finally {
+      setSaving(false);
     }
-
-    setCourseForm({});
-    setEditingId(null);
-    loadData();
   };
 
   const handleEditCourse = (course: Course) => {
@@ -77,38 +96,51 @@ export default function AdminPage() {
     setEditingId(course.id);
   };
 
-  const handleDeleteCourse = (id: string) => {
-    if (confirm('Are you sure you want to delete this course?')) {
-      deleteCourse(id);
-      loadData();
+  const handleDeleteCourse = async (id: string) => {
+    if (confirm('Are you sure you want to delete this course? Associated resources will also be deleted.')) {
+      try {
+        setSaving(true);
+        await deleteCourse(id);
+        await loadData();
+      } catch (error) {
+        console.error('[v0] Error deleting course:', error);
+        alert('Error deleting course');
+      } finally {
+        setSaving(false);
+      }
     }
   };
 
   // RESOURCES
-  const handleAddResource = () => {
-    if (!resourceForm.title || !resourceForm.courseId || !resourceForm.type) {
+  const handleAddResource = async () => {
+    if (!resourceForm.title || !resourceForm.course_id || !resourceForm.type) {
       alert('Please fill in all required fields');
       return;
     }
 
-    const newResource: Resource = {
-      id: editingId || `resource_${Date.now()}`,
-      title: resourceForm.title || '',
-      courseId: resourceForm.courseId || '',
-      type: resourceForm.type as 'pdf' | 'video' | 'document' | 'link',
-      url: resourceForm.url || '',
-      description: resourceForm.description || '',
-    };
+    try {
+      setSaving(true);
+      if (editingId) {
+        await updateResource(editingId, resourceForm as Partial<Resource>);
+      } else {
+        await addResource({
+          title: resourceForm.title,
+          course_id: resourceForm.course_id,
+          type: resourceForm.type as 'pdf' | 'video' | 'document' | 'link',
+          url: resourceForm.url || '',
+          description: resourceForm.description || '',
+        } as Omit<Resource, 'id' | 'created_at' | 'updated_at'>);
+      }
 
-    if (editingId) {
-      updateResource(editingId, newResource);
-    } else {
-      addResource(newResource);
+      setResourceForm({});
+      setEditingId(null);
+      await loadData();
+    } catch (error) {
+      console.error('[v0] Error saving resource:', error);
+      alert('Error saving resource');
+    } finally {
+      setSaving(false);
     }
-
-    setResourceForm({});
-    setEditingId(null);
-    loadData();
   };
 
   const handleEditResource = (resource: Resource) => {
@@ -116,48 +148,69 @@ export default function AdminPage() {
     setEditingId(resource.id);
   };
 
-  const handleDeleteResource = (id: string) => {
+  const handleDeleteResource = async (id: string) => {
     if (confirm('Are you sure you want to delete this resource?')) {
-      deleteResource(id);
-      loadData();
+      try {
+        setSaving(true);
+        await deleteResource(id);
+        await loadData();
+      } catch (error) {
+        console.error('[v0] Error deleting resource:', error);
+        alert('Error deleting resource');
+      } finally {
+        setSaving(false);
+      }
     }
   };
 
   // NEWS
-  const handleAddNews = () => {
+  const handleAddNews = async () => {
     if (!newsForm.title || !newsForm.content) {
       alert('Please fill in all required fields');
       return;
     }
 
-    const newNewsItem: NewsItem = {
-      id: editingId || `news_${Date.now()}`,
-      title: newsForm.title || '',
-      content: newsForm.content || '',
-      date: newsForm.date || new Date().toISOString().split('T')[0],
-      author: newsForm.author || 'Admin',
-    };
+    try {
+      setSaving(true);
+      if (editingId) {
+        await updateNews(editingId, newsForm as Partial<NewsItem>);
+      } else {
+        await addNews({
+          title: newsForm.title,
+          content: newsForm.content,
+          date: newsForm.date || new Date().toISOString().split('T')[0],
+          author: newsForm.author || 'Admin',
+        } as Omit<NewsItem, 'id' | 'created_at' | 'updated_at'>);
+      }
 
-    if (editingId) {
-      updateNews(editingId, newNewsItem);
-    } else {
-      addNews(newNewsItem);
+      setNewsForm({});
+      setEditingId(null);
+      await loadData();
+    } catch (error) {
+      console.error('[v0] Error saving news:', error);
+      alert('Error saving news');
+    } finally {
+      setSaving(false);
     }
-
-    setNewsForm({});
-    setEditingId(null);
-    loadData();
   };
 
-  const handleEditNews = (item: NewsItem) => {
-    setNewsForm(item);
-    setEditingId(item.id);
+  const handleEditNews = (newsItem: NewsItem) => {
+    setNewsForm(newsItem);
+    setEditingId(newsItem.id);
   };
 
-  const handleDeleteNews = (id: string) => {
+  const handleDeleteNews = async (id: string) => {
     if (confirm('Are you sure you want to delete this news item?')) {
-      deleteNews(id);
-      loadData();
+      try {
+        setSaving(true);
+        await deleteNews(id);
+        await loadData();
+      } catch (error) {
+        console.error('[v0] Error deleting news:', error);
+        alert('Error deleting news');
+      } finally {
+        setSaving(false);
+      }
     }
   };
 
@@ -168,158 +221,190 @@ export default function AdminPage() {
     setEditingId(null);
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-xl text-foreground/60">Loading admin dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
 
       {/* Header */}
-      <section className="bg-primary text-primary-foreground py-8">
+      <section className="bg-primary text-primary-foreground py-12">
         <div className="max-w-6xl mx-auto px-4">
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <p className="opacity-90">Manage courses, resources, and news</p>
+          <h1 className="text-4xl font-bold">Admin Dashboard</h1>
+          <p className="text-lg opacity-90">Manage courses, resources, and news</p>
         </div>
       </section>
 
-      {/* Tabs */}
-      <section className="bg-card border-b border-border">
-        <div className="max-w-6xl mx-auto px-4 flex">
-          {(['courses', 'resources', 'news'] as const).map(tab => (
+      {/* Admin Panel */}
+      <section className="py-12 bg-background">
+        <div className="max-w-6xl mx-auto px-4">
+          {/* Tabs */}
+          <div className="flex gap-4 mb-8 border-b border-border">
             <button
-              key={tab}
-              onClick={() => {
-                setActiveTab(tab);
-                handleCancel();
-              }}
-              className={`px-6 py-4 font-semibold capitalize transition ${
-                activeTab === tab
-                  ? 'text-primary border-b-2 border-primary'
-                  : 'text-foreground/60 hover:text-foreground'
+              onClick={() => setActiveTab('courses')}
+              className={`px-4 py-3 font-semibold border-b-2 transition ${
+                activeTab === 'courses'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-foreground/60 hover:text-foreground'
               }`}
             >
-              {tab}
+              Courses ({courses.length})
             </button>
-          ))}
-        </div>
-      </section>
+            <button
+              onClick={() => setActiveTab('resources')}
+              className={`px-4 py-3 font-semibold border-b-2 transition ${
+                activeTab === 'resources'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-foreground/60 hover:text-foreground'
+              }`}
+            >
+              Resources ({resources.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('news')}
+              className={`px-4 py-3 font-semibold border-b-2 transition ${
+                activeTab === 'news'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-foreground/60 hover:text-foreground'
+              }`}
+            >
+              News ({news.length})
+            </button>
+          </div>
 
-      {/* Content */}
-      <section className="py-8 bg-background">
-        <div className="max-w-6xl mx-auto px-4">
           {/* COURSES TAB */}
           {activeTab === 'courses' && (
-            <div className="grid lg:grid-cols-3 gap-8">
+            <div className="space-y-6">
               {/* Form */}
-              <div className="resource-card h-fit">
-                <h2 className="text-2xl font-bold text-primary mb-4">
-                  {editingId ? 'Edit Course' : 'Add Course'}
+              <div className="bg-card border border-border rounded-lg p-6">
+                <h2 className="text-2xl font-bold mb-4">
+                  {editingId ? 'Edit Course' : 'Add New Course'}
                 </h2>
-                <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); handleAddCourse(); }}>
+                <div className="grid md:grid-cols-2 gap-4 mb-4">
                   <input
                     type="text"
                     placeholder="Course Title"
                     value={courseForm.title || ''}
                     onChange={(e) => setCourseForm({ ...courseForm, title: e.target.value })}
-                    className="w-full px-3 py-2 border border-border rounded bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                   <input
                     type="text"
                     placeholder="Course Code"
                     value={courseForm.code || ''}
                     onChange={(e) => setCourseForm({ ...courseForm, code: e.target.value })}
-                    className="w-full px-3 py-2 border border-border rounded bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                   <input
                     type="text"
                     placeholder="Department"
                     value={courseForm.department || ''}
                     onChange={(e) => setCourseForm({ ...courseForm, department: e.target.value })}
-                    className="w-full px-3 py-2 border border-border rounded bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   />
-                  <textarea
-                    placeholder="Description"
-                    value={courseForm.description || ''}
-                    onChange={(e) => setCourseForm({ ...courseForm, description: e.target.value })}
-                    rows={4}
-                    className="w-full px-3 py-2 border border-border rounded bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                  <div className="flex gap-2">
-                    <button type="submit" className="flex-1 btn-primary text-sm">
-                      {editingId ? 'Update' : 'Add'}
+                </div>
+                <textarea
+                  placeholder="Description"
+                  value={courseForm.description || ''}
+                  onChange={(e) => setCourseForm({ ...courseForm, description: e.target.value })}
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary mb-4"
+                  rows={3}
+                />
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleAddCourse}
+                    disabled={saving}
+                    className="btn-primary disabled:opacity-50"
+                  >
+                    {saving ? 'Saving...' : editingId ? 'Update Course' : 'Add Course'}
+                  </button>
+                  {editingId && (
+                    <button
+                      onClick={handleCancel}
+                      disabled={saving}
+                      className="btn-secondary disabled:opacity-50"
+                    >
+                      Cancel
                     </button>
-                    {editingId && (
-                      <button
-                        type="button"
-                        onClick={handleCancel}
-                        className="flex-1 btn-secondary text-sm"
-                      >
-                        Cancel
-                      </button>
-                    )}
-                  </div>
-                </form>
+                  )}
+                </div>
               </div>
 
               {/* List */}
-              <div className="lg:col-span-2">
-                <h2 className="text-2xl font-bold text-primary mb-4">Courses ({courses.length})</h2>
-                <div className="space-y-2">
-                  {courses.map(course => (
-                    <div key={course.id} className="resource-card p-4 flex justify-between items-start gap-3">
-                      <div className="flex-1">
-                        <h3 className="font-bold">{course.title}</h3>
-                        <p className="text-sm text-foreground/60">{course.code} • {course.department}</p>
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleEditCourse(course)}
-                          className="text-primary text-sm font-semibold hover:text-accent"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDeleteCourse(course.id)}
-                          className="text-destructive text-sm font-semibold hover:text-red-700"
-                        >
-                          Delete
-                        </button>
-                      </div>
+              <div className="space-y-3">
+                {courses.map((course) => (
+                  <div
+                    key={course.id}
+                    className="bg-card border border-border rounded-lg p-4 flex justify-between items-start"
+                  >
+                    <div className="flex-1">
+                      <h3 className="font-bold text-primary">{course.code}</h3>
+                      <p className="font-semibold">{course.title}</p>
+                      <p className="text-sm text-foreground/60">{course.department}</p>
+                      <p className="text-sm text-foreground/80 mt-1">{course.description}</p>
                     </div>
-                  ))}
-                </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEditCourse(course)}
+                        disabled={saving}
+                        className="btn-secondary text-sm disabled:opacity-50"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteCourse(course.id)}
+                        disabled={saving}
+                        className="bg-destructive text-destructive-foreground px-3 py-1 rounded text-sm hover:opacity-80 disabled:opacity-50"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
 
           {/* RESOURCES TAB */}
           {activeTab === 'resources' && (
-            <div className="grid lg:grid-cols-3 gap-8">
+            <div className="space-y-6">
               {/* Form */}
-              <div className="resource-card h-fit">
-                <h2 className="text-2xl font-bold text-primary mb-4">
-                  {editingId ? 'Edit Resource' : 'Add Resource'}
+              <div className="bg-card border border-border rounded-lg p-6">
+                <h2 className="text-2xl font-bold mb-4">
+                  {editingId ? 'Edit Resource' : 'Add New Resource'}
                 </h2>
-                <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); handleAddResource(); }}>
+                <div className="grid md:grid-cols-2 gap-4 mb-4">
                   <input
                     type="text"
                     placeholder="Resource Title"
                     value={resourceForm.title || ''}
                     onChange={(e) => setResourceForm({ ...resourceForm, title: e.target.value })}
-                    className="w-full px-3 py-2 border border-border rounded bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                   <select
-                    value={resourceForm.courseId || ''}
-                    onChange={(e) => setResourceForm({ ...resourceForm, courseId: e.target.value })}
-                    className="w-full px-3 py-2 border border-border rounded bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                    value={resourceForm.course_id || ''}
+                    onChange={(e) => setResourceForm({ ...resourceForm, course_id: e.target.value })}
+                    className="px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     <option value="">Select Course</option>
-                    {courses.map(course => (
-                      <option key={course.id} value={course.id}>{course.code}</option>
+                    {courses.map((course) => (
+                      <option key={course.id} value={course.id}>
+                        {course.code} - {course.title}
+                      </option>
                     ))}
                   </select>
                   <select
                     value={resourceForm.type || ''}
                     onChange={(e) => setResourceForm({ ...resourceForm, type: e.target.value as any })}
-                    className="w-full px-3 py-2 border border-border rounded bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     <option value="">Select Type</option>
                     <option value="pdf">PDF</option>
@@ -332,143 +417,158 @@ export default function AdminPage() {
                     placeholder="URL"
                     value={resourceForm.url || ''}
                     onChange={(e) => setResourceForm({ ...resourceForm, url: e.target.value })}
-                    className="w-full px-3 py-2 border border-border rounded bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   />
-                  <textarea
-                    placeholder="Description"
-                    value={resourceForm.description || ''}
-                    onChange={(e) => setResourceForm({ ...resourceForm, description: e.target.value })}
-                    rows={3}
-                    className="w-full px-3 py-2 border border-border rounded bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                  <div className="flex gap-2">
-                    <button type="submit" className="flex-1 btn-primary text-sm">
-                      {editingId ? 'Update' : 'Add'}
+                </div>
+                <textarea
+                  placeholder="Description"
+                  value={resourceForm.description || ''}
+                  onChange={(e) => setResourceForm({ ...resourceForm, description: e.target.value })}
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary mb-4"
+                  rows={3}
+                />
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleAddResource}
+                    disabled={saving}
+                    className="btn-primary disabled:opacity-50"
+                  >
+                    {saving ? 'Saving...' : editingId ? 'Update Resource' : 'Add Resource'}
+                  </button>
+                  {editingId && (
+                    <button
+                      onClick={handleCancel}
+                      disabled={saving}
+                      className="btn-secondary disabled:opacity-50"
+                    >
+                      Cancel
                     </button>
-                    {editingId && (
-                      <button
-                        type="button"
-                        onClick={handleCancel}
-                        className="flex-1 btn-secondary text-sm"
-                      >
-                        Cancel
-                      </button>
-                    )}
-                  </div>
-                </form>
+                  )}
+                </div>
               </div>
 
               {/* List */}
-              <div className="lg:col-span-2">
-                <h2 className="text-2xl font-bold text-primary mb-4">Resources ({resources.length})</h2>
-                <div className="space-y-2">
-                  {resources.map(resource => (
-                    <div key={resource.id} className="resource-card p-4 flex justify-between items-start gap-3">
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-bold truncate">{resource.title}</h3>
-                        <p className="text-sm text-foreground/60">{resource.type} • {resource.courseId}</p>
+              <div className="space-y-3">
+                {resources.map((resource) => {
+                  const course = courses.find((c) => c.id === resource.course_id);
+                  return (
+                    <div
+                      key={resource.id}
+                      className="bg-card border border-border rounded-lg p-4 flex justify-between items-start"
+                    >
+                      <div className="flex-1">
+                        <p className="font-bold text-primary">{resource.title}</p>
+                        <p className="text-sm text-foreground/60">
+                          {course?.code} - {course?.title}
+                        </p>
+                        <p className="text-sm text-foreground/80 mt-1">{resource.description}</p>
+                        <p className="text-xs text-foreground/60 mt-1 break-all">{resource.url}</p>
                       </div>
-                      <div className="flex gap-2 flex-shrink-0">
+                      <div className="flex gap-2">
                         <button
                           onClick={() => handleEditResource(resource)}
-                          className="text-primary text-sm font-semibold hover:text-accent"
+                          disabled={saving}
+                          className="btn-secondary text-sm disabled:opacity-50"
                         >
                           Edit
                         </button>
                         <button
                           onClick={() => handleDeleteResource(resource.id)}
-                          className="text-destructive text-sm font-semibold hover:text-red-700"
+                          disabled={saving}
+                          className="bg-destructive text-destructive-foreground px-3 py-1 rounded text-sm hover:opacity-80 disabled:opacity-50"
                         >
                           Delete
                         </button>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
             </div>
           )}
 
           {/* NEWS TAB */}
           {activeTab === 'news' && (
-            <div className="grid lg:grid-cols-3 gap-8">
+            <div className="space-y-6">
               {/* Form */}
-              <div className="resource-card h-fit">
-                <h2 className="text-2xl font-bold text-primary mb-4">
-                  {editingId ? 'Edit News' : 'Add News'}
+              <div className="bg-card border border-border rounded-lg p-6">
+                <h2 className="text-2xl font-bold mb-4">
+                  {editingId ? 'Edit News' : 'Add New News'}
                 </h2>
-                <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); handleAddNews(); }}>
+                <div className="grid md:grid-cols-2 gap-4 mb-4">
                   <input
                     type="text"
                     placeholder="News Title"
                     value={newsForm.title || ''}
                     onChange={(e) => setNewsForm({ ...newsForm, title: e.target.value })}
-                    className="w-full px-3 py-2 border border-border rounded bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                  <textarea
-                    placeholder="Content"
-                    value={newsForm.content || ''}
-                    onChange={(e) => setNewsForm({ ...newsForm, content: e.target.value })}
-                    rows={5}
-                    className="w-full px-3 py-2 border border-border rounded bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                   <input
                     type="date"
                     value={newsForm.date || new Date().toISOString().split('T')[0]}
                     onChange={(e) => setNewsForm({ ...newsForm, date: e.target.value })}
-                    className="w-full px-3 py-2 border border-border rounded bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   />
-                  <input
-                    type="text"
-                    placeholder="Author"
-                    value={newsForm.author || 'Admin'}
-                    onChange={(e) => setNewsForm({ ...newsForm, author: e.target.value })}
-                    className="w-full px-3 py-2 border border-border rounded bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                  <div className="flex gap-2">
-                    <button type="submit" className="flex-1 btn-primary text-sm">
-                      {editingId ? 'Update' : 'Add'}
+                </div>
+                <textarea
+                  placeholder="News Content"
+                  value={newsForm.content || ''}
+                  onChange={(e) => setNewsForm({ ...newsForm, content: e.target.value })}
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary mb-4"
+                  rows={6}
+                />
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleAddNews}
+                    disabled={saving}
+                    className="btn-primary disabled:opacity-50"
+                  >
+                    {saving ? 'Saving...' : editingId ? 'Update News' : 'Add News'}
+                  </button>
+                  {editingId && (
+                    <button
+                      onClick={handleCancel}
+                      disabled={saving}
+                      className="btn-secondary disabled:opacity-50"
+                    >
+                      Cancel
                     </button>
-                    {editingId && (
-                      <button
-                        type="button"
-                        onClick={handleCancel}
-                        className="flex-1 btn-secondary text-sm"
-                      >
-                        Cancel
-                      </button>
-                    )}
-                  </div>
-                </form>
+                  )}
+                </div>
               </div>
 
               {/* List */}
-              <div className="lg:col-span-2">
-                <h2 className="text-2xl font-bold text-primary mb-4">News Items ({news.length})</h2>
-                <div className="space-y-2">
-                  {news.map(item => (
-                    <div key={item.id} className="resource-card p-4 flex justify-between items-start gap-3">
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-bold truncate">{item.title}</h3>
-                        <p className="text-sm text-foreground/60">{item.date} • {item.author}</p>
-                      </div>
-                      <div className="flex gap-2 flex-shrink-0">
-                        <button
-                          onClick={() => handleEditNews(item)}
-                          className="text-primary text-sm font-semibold hover:text-accent"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDeleteNews(item.id)}
-                          className="text-destructive text-sm font-semibold hover:text-red-700"
-                        >
-                          Delete
-                        </button>
-                      </div>
+              <div className="space-y-3">
+                {news.map((newsItem) => (
+                  <div
+                    key={newsItem.id}
+                    className="bg-card border border-border rounded-lg p-4 flex justify-between items-start"
+                  >
+                    <div className="flex-1">
+                      <p className="font-bold text-primary">{newsItem.title}</p>
+                      <p className="text-sm text-foreground/60">
+                        📅 {new Date(newsItem.date).toLocaleDateString()} | ✍️ {newsItem.author}
+                      </p>
+                      <p className="text-sm text-foreground/80 mt-2">{newsItem.content}</p>
                     </div>
-                  ))}
-                </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEditNews(newsItem)}
+                        disabled={saving}
+                        className="btn-secondary text-sm disabled:opacity-50"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteNews(newsItem.id)}
+                        disabled={saving}
+                        className="bg-destructive text-destructive-foreground px-3 py-1 rounded text-sm hover:opacity-80 disabled:opacity-50"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -476,7 +576,7 @@ export default function AdminPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-primary text-primary-foreground py-8 mt-8">
+      <footer className="bg-primary text-primary-foreground py-8">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <p className="opacity-80">
             &copy; 2024 LASU STESSA. All rights reserved.

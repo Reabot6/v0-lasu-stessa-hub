@@ -9,9 +9,21 @@ export default function AcademicsPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setCourses(getCourses());
+    const fetchCourses = async () => {
+      try {
+        const data = await getCourses();
+        setCourses(data);
+      } catch (error) {
+        console.error('[v0] Error fetching courses:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
     setIsAdmin(isAdminLoggedIn());
   }, []);
 
@@ -51,7 +63,11 @@ export default function AcademicsPage() {
           </div>
 
           {/* Course Grid */}
-          {filteredCourses.length > 0 ? (
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-lg text-foreground/60">Loading courses...</p>
+            </div>
+          ) : filteredCourses.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredCourses.map((course) => (
                 <Link key={course.id} href={`/resources?course=${course.id}`}>

@@ -15,15 +15,30 @@ export default function ResourcesPage() {
   const [selectedCourse, setSelectedCourse] = useState<string>(courseFilter || '');
   const [searchTerm, setSearchTerm] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setResources(getResources());
-    setCourses(getCourses());
+    const fetchData = async () => {
+      try {
+        const [resourcesData, coursesData] = await Promise.all([
+          getResources(),
+          getCourses(),
+        ]);
+        setResources(resourcesData);
+        setCourses(coursesData);
+      } catch (error) {
+        console.error('[v0] Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
     setIsAdmin(isAdminLoggedIn());
   }, []);
 
   const filteredResources = resources.filter(resource => {
-    const matchesCourse = !selectedCourse || resource.courseId === selectedCourse;
+    const matchesCourse = !selectedCourse || resource.course_id === selectedCourse;
     const matchesSearch = resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       resource.description.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCourse && matchesSearch;
@@ -84,7 +99,11 @@ export default function ResourcesPage() {
           </div>
 
           {/* Resources List */}
-          {filteredResources.length > 0 ? (
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-lg text-foreground/60">Loading resources...</p>
+            </div>
+          ) : filteredResources.length > 0 ? (
             <div className="space-y-4">
               {filteredResources.map((resource) => (
                 <div key={resource.id} className="resource-card">
@@ -94,7 +113,7 @@ export default function ResourcesPage() {
                         <span className="text-2xl">{getResourceIcon(resource.type)}</span>
                         <div>
                           <h3 className="text-lg font-bold text-primary">{resource.title}</h3>
-                          <p className="text-sm text-foreground/60">{getCourseName(resource.courseId)}</p>
+                          <p className="text-sm text-foreground/60">{getCourseName(resource.course_id)}</p>
                         </div>
                       </div>
                       <p className="text-foreground/80 mb-4">{resource.description}</p>

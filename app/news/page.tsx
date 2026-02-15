@@ -8,9 +8,21 @@ export default function NewsPage() {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setNews(getNews());
+    const fetchNews = async () => {
+      try {
+        const data = await getNews();
+        setNews(data);
+      } catch (error) {
+        console.error('[v0] Error fetching news:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNews();
     setIsAdmin(isAdminLoggedIn());
   }, []);
 
@@ -54,7 +66,11 @@ export default function NewsPage() {
           </div>
 
           {/* News Items */}
-          {filteredNews.length > 0 ? (
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-lg text-foreground/60">Loading news...</p>
+            </div>
+          ) : filteredNews.length > 0 ? (
             <div className="space-y-6">
               {filteredNews.map((item) => (
                 <article key={item.id} className="resource-card">

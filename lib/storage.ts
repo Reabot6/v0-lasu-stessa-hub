@@ -1,4 +1,9 @@
-// Data storage utilities for browser localStorage
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
+export const supabase = createClient(supabaseUrl, supabaseKey);
 
 export interface Course {
   id: string;
@@ -6,15 +11,19 @@ export interface Course {
   department: string;
   description: string;
   code: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Resource {
   id: string;
   title: string;
-  courseId: string;
+  course_id: string;
   type: 'pdf' | 'video' | 'document' | 'link';
   url: string;
   description: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface NewsItem {
@@ -23,220 +32,288 @@ export interface NewsItem {
   content: string;
   date: string;
   author: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
-export interface AdminUser {
-  email: string;
-  password: string;
-}
-
-const STORAGE_KEYS = {
-  COURSES: 'stessa_courses',
-  RESOURCES: 'stessa_resources',
-  NEWS: 'stessa_news',
-  ADMIN_SESSION: 'stessa_admin_session',
-};
-
-// Initialize default data
+// Initialize function - no longer needed for Supabase but kept for compatibility
 export const initializeStorage = () => {
-  if (typeof window === 'undefined') return;
+  console.log('[v0] Storage initialized with Supabase');
+};
 
-  const defaultCourses: Course[] = [
-    {
-      id: 'cs101',
-      title: 'Introduction to Computer Science',
-      department: 'Computer Science',
-      description: 'Fundamentals of programming and computer systems',
-      code: 'CS101',
-    },
-    {
-      id: 'cs201',
-      title: 'Data Structures',
-      department: 'Computer Science',
-      description: 'Advanced data structures and algorithms',
-      code: 'CS201',
-    },
-    {
-      id: 'cs301',
-      title: 'Software Engineering',
-      department: 'Computer Science',
-      description: 'Software development methodologies and practices',
-      code: 'CS301',
-    },
-  ];
+// ============== COURSES ==============
 
-  const defaultResources: Resource[] = [
-    {
-      id: 'res1',
-      title: 'Python Basics Tutorial',
-      courseId: 'cs101',
-      type: 'video',
-      url: '#',
-      description: 'Learn Python fundamentals',
-    },
-    {
-      id: 'res2',
-      title: 'DSA Study Guide',
-      courseId: 'cs201',
-      type: 'pdf',
-      url: '#',
-      description: 'Comprehensive data structures guide',
-    },
-    {
-      id: 'res3',
-      title: 'Software Engineering Handbook',
-      courseId: 'cs301',
-      type: 'document',
-      url: '#',
-      description: 'Best practices and methodologies',
-    },
-  ];
+export const getCourses = async (): Promise<Course[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('courses')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-  const defaultNews: NewsItem[] = [
-    {
-      id: 'news1',
-      title: 'Welcome to STESSA',
-      content: 'Welcome to the Science, Technology, Engineering and Skills Services for Africa program. This is your hub for accessing all educational resources and updates.',
-      date: new Date().toISOString().split('T')[0],
-      author: 'Admin',
-    },
-  ];
-
-  if (!localStorage.getItem(STORAGE_KEYS.COURSES)) {
-    localStorage.setItem(STORAGE_KEYS.COURSES, JSON.stringify(defaultCourses));
-  }
-
-  if (!localStorage.getItem(STORAGE_KEYS.RESOURCES)) {
-    localStorage.setItem(STORAGE_KEYS.RESOURCES, JSON.stringify(defaultResources));
-  }
-
-  if (!localStorage.getItem(STORAGE_KEYS.NEWS)) {
-    localStorage.setItem(STORAGE_KEYS.NEWS, JSON.stringify(defaultNews));
+    if (error) throw error;
+    return (data as Course[]) || [];
+  } catch (error) {
+    console.error('[v0] Error fetching courses:', error);
+    return [];
   }
 };
 
-// Courses
-export const getCourses = (): Course[] => {
-  if (typeof window === 'undefined') return [];
-  const data = localStorage.getItem(STORAGE_KEYS.COURSES);
-  return data ? JSON.parse(data) : [];
-};
+export const getCourseById = async (id: string): Promise<Course | undefined> => {
+  try {
+    const { data, error } = await supabase
+      .from('courses')
+      .select('*')
+      .eq('id', id)
+      .single();
 
-export const getCourseById = (id: string): Course | undefined => {
-  return getCourses().find(c => c.id === id);
-};
-
-export const addCourse = (course: Course): void => {
-  const courses = getCourses();
-  courses.push(course);
-  localStorage.setItem(STORAGE_KEYS.COURSES, JSON.stringify(courses));
-};
-
-export const updateCourse = (id: string, updated: Partial<Course>): void => {
-  const courses = getCourses();
-  const index = courses.findIndex(c => c.id === id);
-  if (index !== -1) {
-    courses[index] = { ...courses[index], ...updated };
-    localStorage.setItem(STORAGE_KEYS.COURSES, JSON.stringify(courses));
+    if (error) throw error;
+    return data as Course;
+  } catch (error) {
+    console.error('[v0] Error fetching course:', error);
+    return undefined;
   }
 };
 
-export const deleteCourse = (id: string): void => {
-  let courses = getCourses();
-  courses = courses.filter(c => c.id !== id);
-  localStorage.setItem(STORAGE_KEYS.COURSES, JSON.stringify(courses));
-  
-  // Also delete associated resources
-  deleteResourcesByCourse(id);
-};
+export const addCourse = async (course: Omit<Course, 'id' | 'created_at' | 'updated_at'>): Promise<Course | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('courses')
+      .insert([course])
+      .select()
+      .single();
 
-// Resources
-export const getResources = (): Resource[] => {
-  if (typeof window === 'undefined') return [];
-  const data = localStorage.getItem(STORAGE_KEYS.RESOURCES);
-  return data ? JSON.parse(data) : [];
-};
-
-export const getResourcesByCourse = (courseId: string): Resource[] => {
-  return getResources().filter(r => r.courseId === courseId);
-};
-
-export const addResource = (resource: Resource): void => {
-  const resources = getResources();
-  resources.push(resource);
-  localStorage.setItem(STORAGE_KEYS.RESOURCES, JSON.stringify(resources));
-};
-
-export const updateResource = (id: string, updated: Partial<Resource>): void => {
-  const resources = getResources();
-  const index = resources.findIndex(r => r.id === id);
-  if (index !== -1) {
-    resources[index] = { ...resources[index], ...updated };
-    localStorage.setItem(STORAGE_KEYS.RESOURCES, JSON.stringify(resources));
+    if (error) throw error;
+    return data as Course;
+  } catch (error) {
+    console.error('[v0] Error adding course:', error);
+    return null;
   }
 };
 
-export const deleteResource = (id: string): void => {
-  let resources = getResources();
-  resources = resources.filter(r => r.id !== id);
-  localStorage.setItem(STORAGE_KEYS.RESOURCES, JSON.stringify(resources));
-};
+export const updateCourse = async (id: string, updates: Partial<Course>): Promise<Course | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('courses')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
 
-export const deleteResourcesByCourse = (courseId: string): void => {
-  let resources = getResources();
-  resources = resources.filter(r => r.courseId !== courseId);
-  localStorage.setItem(STORAGE_KEYS.RESOURCES, JSON.stringify(resources));
-};
-
-// News
-export const getNews = (): NewsItem[] => {
-  if (typeof window === 'undefined') return [];
-  const data = localStorage.getItem(STORAGE_KEYS.NEWS);
-  return data ? JSON.parse(data) : [];
-};
-
-export const addNews = (news: NewsItem): void => {
-  const items = getNews();
-  items.unshift(news);
-  localStorage.setItem(STORAGE_KEYS.NEWS, JSON.stringify(items));
-};
-
-export const updateNews = (id: string, updated: Partial<NewsItem>): void => {
-  const items = getNews();
-  const index = items.findIndex(n => n.id === id);
-  if (index !== -1) {
-    items[index] = { ...items[index], ...updated };
-    localStorage.setItem(STORAGE_KEYS.NEWS, JSON.stringify(items));
+    if (error) throw error;
+    return data as Course;
+  } catch (error) {
+    console.error('[v0] Error updating course:', error);
+    return null;
   }
 };
 
-export const deleteNews = (id: string): void => {
-  let items = getNews();
-  items = items.filter(n => n.id !== id);
-  localStorage.setItem(STORAGE_KEYS.NEWS, JSON.stringify(items));
+export const deleteCourse = async (id: string): Promise<boolean> => {
+  try {
+    const { error: resourceError } = await supabase
+      .from('resources')
+      .delete()
+      .eq('course_id', id);
+
+    if (resourceError) throw resourceError;
+
+    const { error } = await supabase
+      .from('courses')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error('[v0] Error deleting course:', error);
+    return false;
+  }
 };
 
-// Admin
-const ADMIN_EMAIL = 'stessaedu@gmail.com';
-const ADMIN_PASSWORD = 'admin123stessa';
+// ============== RESOURCES ==============
 
-export const verifyAdmin = (email: string, password: string): boolean => {
-  return email === ADMIN_EMAIL && password === ADMIN_PASSWORD;
+export const getResources = async (): Promise<Resource[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('resources')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return (data as Resource[]) || [];
+  } catch (error) {
+    console.error('[v0] Error fetching resources:', error);
+    return [];
+  }
+};
+
+export const getResourcesByCourse = async (courseId: string): Promise<Resource[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('resources')
+      .select('*')
+      .eq('course_id', courseId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return (data as Resource[]) || [];
+  } catch (error) {
+    console.error('[v0] Error fetching resources by course:', error);
+    return [];
+  }
+};
+
+export const addResource = async (resource: Omit<Resource, 'id' | 'created_at' | 'updated_at'>): Promise<Resource | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('resources')
+      .insert([resource])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data as Resource;
+  } catch (error) {
+    console.error('[v0] Error adding resource:', error);
+    return null;
+  }
+};
+
+export const updateResource = async (id: string, updates: Partial<Resource>): Promise<Resource | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('resources')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data as Resource;
+  } catch (error) {
+    console.error('[v0] Error updating resource:', error);
+    return null;
+  }
+};
+
+export const deleteResource = async (id: string): Promise<boolean> => {
+  try {
+    const { error } = await supabase
+      .from('resources')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error('[v0] Error deleting resource:', error);
+    return false;
+  }
+};
+
+export const deleteResourcesByCourse = async (courseId: string): Promise<boolean> => {
+  try {
+    const { error } = await supabase
+      .from('resources')
+      .delete()
+      .eq('course_id', courseId);
+
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error('[v0] Error deleting resources by course:', error);
+    return false;
+  }
+};
+
+// ============== NEWS ==============
+
+export const getNews = async (): Promise<NewsItem[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('news')
+      .select('*')
+      .order('date', { ascending: false });
+
+    if (error) throw error;
+    return (data as NewsItem[]) || [];
+  } catch (error) {
+    console.error('[v0] Error fetching news:', error);
+    return [];
+  }
+};
+
+export const addNews = async (news: Omit<NewsItem, 'id' | 'created_at' | 'updated_at'>): Promise<NewsItem | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('news')
+      .insert([news])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data as NewsItem;
+  } catch (error) {
+    console.error('[v0] Error adding news:', error);
+    return null;
+  }
+};
+
+export const updateNews = async (id: string, updates: Partial<NewsItem>): Promise<NewsItem | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('news')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data as NewsItem;
+  } catch (error) {
+    console.error('[v0] Error updating news:', error);
+    return null;
+  }
+};
+
+export const deleteNews = async (id: string): Promise<boolean> => {
+  try {
+    const { error } = await supabase
+      .from('news')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error('[v0] Error deleting news:', error);
+    return false;
+  }
+};
+
+// ============== ADMIN ==============
+
+export const verifyAdmin = async (email: string, password: string): Promise<boolean> => {
+  // For client-side verification, we'll use a simple check
+  // In production, this should be done server-side
+  if (email === 'stessaedu@gmail.com' && password === 'admin123stessa') {
+    return true;
+  }
+  return false;
 };
 
 export const setAdminSession = (token: string): void => {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEYS.ADMIN_SESSION, token);
+  localStorage.setItem('stessa_admin_session', token);
 };
 
 export const getAdminSession = (): string | null => {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem(STORAGE_KEYS.ADMIN_SESSION);
+  return localStorage.getItem('stessa_admin_session');
 };
 
 export const clearAdminSession = (): void => {
   if (typeof window === 'undefined') return;
-  localStorage.removeItem(STORAGE_KEYS.ADMIN_SESSION);
+  localStorage.removeItem('stessa_admin_session');
 };
 
 export const isAdminLoggedIn = (): boolean => {
