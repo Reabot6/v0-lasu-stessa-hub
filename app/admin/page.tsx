@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Navigation } from '@/components/navigation';
+import { FileUpload } from '@/components/file-upload';
 import {
   getCourses, getResources, getNews, isAdminLoggedIn,
   Course, Resource, NewsItem,
@@ -403,7 +404,7 @@ export default function AdminPage() {
                   </select>
                   <select
                     value={resourceForm.type || ''}
-                    onChange={(e) => setResourceForm({ ...resourceForm, type: e.target.value as any })}
+                    onChange={(e) => setResourceForm({ ...resourceForm, type: e.target.value })}
                     className="px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     <option value="">Select Type</option>
@@ -411,15 +412,51 @@ export default function AdminPage() {
                     <option value="video">Video</option>
                     <option value="document">Document</option>
                     <option value="link">Link</option>
+                    <option value="file">File Upload</option>
+                    <option value="image">Image</option>
+                    <option value="audio">Audio</option>
+                    <option value="other">Other</option>
                   </select>
                   <input
                     type="text"
-                    placeholder="URL"
+                    placeholder="URL or upload file below"
                     value={resourceForm.url || ''}
                     onChange={(e) => setResourceForm({ ...resourceForm, url: e.target.value })}
                     className="px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
+                
+                {/* File Upload Section */}
+                {resourceForm.course_id && (
+                  <div className="mb-4 p-4 bg-muted rounded-lg">
+                    <h3 className="font-semibold mb-3">Upload File</h3>
+                    <FileUpload
+                      courseId={resourceForm.course_id}
+                      onUploadSuccess={(url, fileName, fileSize) => {
+                        setResourceForm({
+                          ...resourceForm,
+                          url,
+                          file_name: fileName,
+                          file_size: fileSize,
+                        });
+                      }}
+                      onUploadError={(error) => {
+                        alert(`Upload error: ${error}`);
+                      }}
+                    />
+                    {resourceForm.file_name && (
+                      <div className="mt-3 text-sm">
+                        <p className="text-foreground/80">
+                          <strong>File:</strong> {resourceForm.file_name}
+                        </p>
+                        <p className="text-foreground/60">
+                          Size: {resourceForm.file_size ? `${(resourceForm.file_size / 1024 / 1024).toFixed(2)} MB` : 'Unknown'}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
                 <textarea
                   placeholder="Description"
                   value={resourceForm.description || ''}
@@ -459,10 +496,15 @@ export default function AdminPage() {
                       <div className="flex-1">
                         <p className="font-bold text-primary">{resource.title}</p>
                         <p className="text-sm text-foreground/60">
-                          {course?.code} - {course?.title}
+                          {course?.code} - {course?.title} • <span className="capitalize">{resource.type}</span>
                         </p>
                         <p className="text-sm text-foreground/80 mt-1">{resource.description}</p>
-                        <p className="text-xs text-foreground/60 mt-1 break-all">{resource.url}</p>
+                        <p className="text-xs text-foreground/60 mt-1 break-all">URL: {resource.url}</p>
+                        {resource.file_name && (
+                          <p className="text-xs text-foreground/60 mt-1">
+                            📁 {resource.file_name} {resource.file_size ? `(${(resource.file_size / 1024 / 1024).toFixed(2)} MB)` : ''}
+                          </p>
+                        )}
                       </div>
                       <div className="flex gap-2">
                         <button

@@ -3,6 +3,9 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
+console.log('[v0] Supabase URL:', supabaseUrl ? 'Set' : 'Not set');
+console.log('[v0] Supabase Key:', supabaseKey ? 'Set' : 'Not set');
+
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
 export interface Course {
@@ -19,9 +22,11 @@ export interface Resource {
   id: string;
   title: string;
   course_id: string;
-  type: 'pdf' | 'video' | 'document' | 'link';
+  type: string;
   url: string;
   description: string;
+  file_name?: string;
+  file_size?: number;
   created_at?: string;
   updated_at?: string;
 }
@@ -41,16 +46,86 @@ export const initializeStorage = () => {
   console.log('[v0] Storage initialized with Supabase');
 };
 
+// ============== FILE UPLOAD ==============
+
+export const uploadResourceFile = async (file: File, courseId: string): Promise<{ url: string; fileName: string; fileSize: number } | null> => {
+  try {
+    console.log('[v0] Starting file upload for:', file.name);
+    
+    // Create a unique file name with timestamp to avoid collisions
+    const timestamp = Date.now();
+    const fileName = `${courseId}/${timestamp}-${file.name}`;
+    
+    const { data, error } = await supabase
+      .storage
+      .from('resources')
+      .upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false,
+      });
+
+    if (error) {
+      console.error('[v0] Upload error:', error);
+      throw error;
+    }
+
+    console.log('[v0] File uploaded successfully:', data);
+
+    // Get the public URL
+    const { data: publicUrlData } = supabase
+      .storage
+      .from('resources')
+      .getPublicUrl(fileName);
+
+    return {
+      url: publicUrlData.publicUrl,
+      fileName: file.name,
+      fileSize: file.size,
+    };
+  } catch (error) {
+    console.error('[v0] Error uploading file:', error);
+    return null;
+  }
+};
+
+export const deleteResourceFile = async (filePath: string): Promise<boolean> => {
+  try {
+    console.log('[v0] Deleting file:', filePath);
+    
+    const { error } = await supabase
+      .storage
+      .from('resources')
+      .remove([filePath]);
+
+    if (error) {
+      console.error('[v0] Delete error:', error);
+      throw error;
+    }
+
+    console.log('[v0] File deleted successfully');
+    return true;
+  } catch (error) {
+    console.error('[v0] Error deleting file:', error);
+    return false;
+  }
+};
+
 // ============== COURSES ==============
 
 export const getCourses = async (): Promise<Course[]> => {
   try {
+    console.log('[v0] Fetching courses...');
     const { data, error } = await supabase
       .from('courses')
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      console.error('[v0] Supabase error:', error);
+      throw error;
+    }
+    
+    console.log('[v0] Courses fetched:', data?.length || 0);
     return (data as Course[]) || [];
   } catch (error) {
     console.error('[v0] Error fetching courses:', error);
@@ -76,6 +151,7 @@ export const getCourseById = async (id: string): Promise<Course | undefined> => 
 
 export const addCourse = async (course: Omit<Course, 'id' | 'created_at' | 'updated_at'>): Promise<Course | null> => {
   try {
+    console.log('[v0] Adding course:', course.title);
     const { data, error } = await supabase
       .from('courses')
       .insert([course])
@@ -83,6 +159,7 @@ export const addCourse = async (course: Omit<Course, 'id' | 'created_at' | 'upda
       .single();
 
     if (error) throw error;
+    console.log('[v0] Course added successfully');
     return data as Course;
   } catch (error) {
     console.error('[v0] Error adding course:', error);
@@ -133,12 +210,18 @@ export const deleteCourse = async (id: string): Promise<boolean> => {
 
 export const getResources = async (): Promise<Resource[]> => {
   try {
+    console.log('[v0] Fetching resources...');
     const { data, error } = await supabase
       .from('resources')
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      console.error('[v0] Supabase error:', error);
+      throw error;
+    }
+    
+    console.log('[v0] Resources fetched:', data?.length || 0);
     return (data as Resource[]) || [];
   } catch (error) {
     console.error('[v0] Error fetching resources:', error);
@@ -164,6 +247,7 @@ export const getResourcesByCourse = async (courseId: string): Promise<Resource[]
 
 export const addResource = async (resource: Omit<Resource, 'id' | 'created_at' | 'updated_at'>): Promise<Resource | null> => {
   try {
+    console.log('[v0] Adding resource:', resource.title);
     const { data, error } = await supabase
       .from('resources')
       .insert([resource])
@@ -171,6 +255,7 @@ export const addResource = async (resource: Omit<Resource, 'id' | 'created_at' |
       .single();
 
     if (error) throw error;
+    console.log('[v0] Resource added successfully');
     return data as Resource;
   } catch (error) {
     console.error('[v0] Error adding resource:', error);
@@ -229,12 +314,18 @@ export const deleteResourcesByCourse = async (courseId: string): Promise<boolean
 
 export const getNews = async (): Promise<NewsItem[]> => {
   try {
+    console.log('[v0] Fetching news...');
     const { data, error } = await supabase
       .from('news')
       .select('*')
       .order('date', { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      console.error('[v0] Supabase error:', error);
+      throw error;
+    }
+    
+    console.log('[v0] News fetched:', data?.length || 0);
     return (data as NewsItem[]) || [];
   } catch (error) {
     console.error('[v0] Error fetching news:', error);

@@ -29,16 +29,18 @@ async function runMigrations() {
       `,
     }).catch(() => ({ error: null }));
 
-    // Create resources table
+    // Create resources table with file support
     const { error: resourcesError } = await supabase.rpc("execute_sql", {
       sql: `
         CREATE TABLE IF NOT EXISTS resources (
           id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
           title TEXT NOT NULL,
           course_id UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
-          type TEXT NOT NULL CHECK (type IN ('pdf', 'video', 'document', 'link')),
+          type TEXT NOT NULL,
           url TEXT NOT NULL,
           description TEXT,
+          file_name TEXT,
+          file_size INTEGER,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -61,6 +63,33 @@ async function runMigrations() {
     }).catch(() => ({ error: null }));
 
     console.log("[v0] Tables created successfully");
+
+    // Create storage bucket for resources if it doesn't exist
+    try {
+      const { data: buckets } = await supabase
+        .storage
+        .listBuckets();
+      
+      const resourcesBucketExists = buckets?.some(b => b.name === 'resources');
+      
+      if (!resourcesBucketExists) {
+        const { error: bucketError } = await supabase
+          .storage
+          .createBucket('resources', {
+            public: true,
+            allowedMimeTypes: null, // Allow all file types
+            fileSizeLimit: 104857600, // 100MB limit
+          });
+        
+        if (!bucketError) {
+          console.log("[v0] Resources storage bucket created");
+        }
+      } else {
+        console.log("[v0] Resources storage bucket already exists");
+      }
+    } catch (error) {
+      console.log("[v0] Could not create bucket (may already exist):", error.message);
+    }
 
     // Insert default courses
     const { error: courseInsertError } = await supabase
@@ -103,7 +132,7 @@ async function runMigrations() {
       return;
     }
 
-    const courseMap: Record<string, string> = {};
+    const courseMap = {};
     courses?.forEach((course) => {
       courseMap[course.code] = course.id;
     });
