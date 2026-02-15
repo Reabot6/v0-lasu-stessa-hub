@@ -3,10 +3,20 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-console.log('[v0] Supabase URL:', supabaseUrl ? 'Set' : 'Not set');
-console.log('[v0] Supabase Key:', supabaseKey ? 'Set' : 'Not set');
+// Check if environment variables are set
+const isConfigured = !!(supabaseUrl && supabaseKey);
+
+console.log('[v0] Supabase URL:', supabaseUrl ? '✓ Set' : '✗ NOT SET');
+console.log('[v0] Supabase Key:', supabaseKey ? '✓ Set' : '✗ NOT SET');
+console.log('[v0] Supabase Configured:', isConfigured);
+
+if (!isConfigured) {
+  console.warn('[v0] ⚠️ WARNING: Supabase environment variables are not set!');
+  console.warn('[v0] Please add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to your .env.local file');
+}
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
+export const isSupabaseConfigured = isConfigured;
 
 export interface Course {
   id: string;
@@ -114,6 +124,11 @@ export const deleteResourceFile = async (filePath: string): Promise<boolean> => 
 
 export const getCourses = async (): Promise<Course[]> => {
   try {
+    if (!isSupabaseConfigured) {
+      console.warn('[v0] Supabase not configured. Please set environment variables.');
+      return [];
+    }
+
     console.log('[v0] Fetching courses...');
     const { data, error } = await supabase
       .from('courses')
@@ -121,14 +136,19 @@ export const getCourses = async (): Promise<Course[]> => {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('[v0] Supabase error:', error);
+      console.error('[v0] Supabase error getting courses:', JSON.stringify(error, null, 2));
       throw error;
     }
     
-    console.log('[v0] Courses fetched:', data?.length || 0);
+    console.log('[v0] Courses fetched successfully:', data?.length || 0, 'items');
     return (data as Course[]) || [];
-  } catch (error) {
-    console.error('[v0] Error fetching courses:', error);
+  } catch (error: any) {
+    console.error('[v0] Error fetching courses:', JSON.stringify(error, null, 2));
+    console.error('[v0] Error details:', {
+      message: error?.message,
+      code: error?.code,
+      status: error?.status,
+    });
     return [];
   }
 };
@@ -210,6 +230,11 @@ export const deleteCourse = async (id: string): Promise<boolean> => {
 
 export const getResources = async (): Promise<Resource[]> => {
   try {
+    if (!isSupabaseConfigured) {
+      console.warn('[v0] Supabase not configured. Please set environment variables.');
+      return [];
+    }
+
     console.log('[v0] Fetching resources...');
     const { data, error } = await supabase
       .from('resources')
@@ -217,14 +242,19 @@ export const getResources = async (): Promise<Resource[]> => {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('[v0] Supabase error:', error);
+      console.error('[v0] Supabase error getting resources:', JSON.stringify(error, null, 2));
       throw error;
     }
     
-    console.log('[v0] Resources fetched:', data?.length || 0);
+    console.log('[v0] Resources fetched successfully:', data?.length || 0, 'items');
     return (data as Resource[]) || [];
-  } catch (error) {
-    console.error('[v0] Error fetching resources:', error);
+  } catch (error: any) {
+    console.error('[v0] Error fetching resources:', JSON.stringify(error, null, 2));
+    console.error('[v0] Error details:', {
+      message: error?.message,
+      code: error?.code,
+      status: error?.status,
+    });
     return [];
   }
 };
@@ -314,6 +344,11 @@ export const deleteResourcesByCourse = async (courseId: string): Promise<boolean
 
 export const getNews = async (): Promise<NewsItem[]> => {
   try {
+    if (!isSupabaseConfigured) {
+      console.warn('[v0] Supabase not configured. Please set environment variables.');
+      return [];
+    }
+
     console.log('[v0] Fetching news...');
     const { data, error } = await supabase
       .from('news')
@@ -321,14 +356,19 @@ export const getNews = async (): Promise<NewsItem[]> => {
       .order('date', { ascending: false });
 
     if (error) {
-      console.error('[v0] Supabase error:', error);
+      console.error('[v0] Supabase error getting news:', JSON.stringify(error, null, 2));
       throw error;
     }
     
-    console.log('[v0] News fetched:', data?.length || 0);
+    console.log('[v0] News fetched successfully:', data?.length || 0, 'items');
     return (data as NewsItem[]) || [];
-  } catch (error) {
-    console.error('[v0] Error fetching news:', error);
+  } catch (error: any) {
+    console.error('[v0] Error fetching news:', JSON.stringify(error, null, 2));
+    console.error('[v0] Error details:', {
+      message: error?.message,
+      code: error?.code,
+      status: error?.status,
+    });
     return [];
   }
 };

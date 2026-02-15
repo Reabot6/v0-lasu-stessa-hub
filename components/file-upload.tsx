@@ -12,12 +12,10 @@ interface FileUploadProps {
 export function FileUpload({ courseId, onUploadSuccess, onUploadError }: FileUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const handleFileUpload = async (file: File) => {
     setUploading(true);
     setProgress(0);
 
@@ -47,23 +45,88 @@ export function FileUpload({ courseId, onUploadSuccess, onUploadError }: FileUpl
     }
   };
 
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await handleFileUpload(file);
+  };
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      const file = files[0];
+      await handleFileUpload(file);
+    }
+  };
+
   return (
     <div className="space-y-3">
-      <input
-        ref={fileInputRef}
-        type="file"
-        onChange={handleFileChange}
-        disabled={uploading}
-        className="block w-full text-sm text-foreground/60
-          file:mr-4 file:py-2 file:px-4
-          file:rounded-md file:border-0
-          file:text-sm file:font-semibold
-          file:bg-primary file:text-primary-foreground
-          hover:file:bg-accent
-          disabled:opacity-50"
-        accept="*/*"
-      />
-      
+      {/* Drag and Drop Area */}
+      <div
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+        className={`border-2 border-dashed rounded-lg p-6 text-center transition-all cursor-pointer ${
+          isDragging
+            ? 'border-primary bg-primary/10'
+            : 'border-border hover:border-primary/50 hover:bg-muted/50'
+        } ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+      >
+        <div className="space-y-3">
+          <div className="text-3xl">📁</div>
+          <div>
+            <p className="font-semibold text-foreground">
+              {isDragging ? 'Drop file here' : 'Drag and drop your file here'}
+            </p>
+            <p className="text-sm text-foreground/60">or click to browse</p>
+            <p className="text-xs text-foreground/50 mt-2">
+              Supports any file type (PDF, images, videos, documents, etc.)
+            </p>
+          </div>
+        </div>
+
+        {/* Hidden File Input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          onChange={handleFileChange}
+          disabled={uploading}
+          className="hidden"
+          accept="*/*"
+        />
+
+        {/* Clickable Area */}
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploading}
+          className="absolute inset-0 cursor-pointer"
+          aria-label="Upload file"
+        />
+      </div>
+
+      {/* Progress Bar */}
       {uploading && (
         <div className="space-y-2">
           <div className="w-full bg-muted rounded-full h-2">
@@ -72,9 +135,26 @@ export function FileUpload({ courseId, onUploadSuccess, onUploadError }: FileUpl
               style={{ width: `${progress}%` }}
             />
           </div>
-          <p className="text-xs text-foreground/60">Uploading... {progress}%</p>
+          <p className="text-xs text-foreground/60 text-center">Uploading... {progress}%</p>
         </div>
       )}
+
+      {/* Alternative: Traditional File Input */}
+      <div className="relative">
+        <input
+          type="file"
+          onChange={handleFileChange}
+          disabled={uploading}
+          className="block w-full text-sm text-foreground/60
+            file:mr-4 file:py-2 file:px-4
+            file:rounded-md file:border-0
+            file:text-sm file:font-semibold
+            file:bg-accent file:text-accent-foreground
+            hover:file:bg-primary hover:file:text-primary-foreground
+            disabled:opacity-50 disabled:cursor-not-allowed"
+          accept="*/*"
+        />
+      </div>
     </div>
   );
 }

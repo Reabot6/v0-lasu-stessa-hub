@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Navigation } from '@/components/navigation';
+import { SupabaseStatus } from '@/components/supabase-status';
 import { FileUpload } from '@/components/file-upload';
 import {
   getCourses, getResources, getNews, isAdminLoggedIn,
@@ -234,6 +235,7 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SupabaseStatus />
       <Navigation />
 
       {/* Header */}
@@ -589,7 +591,7 @@ export default function AdminPage() {
                     <div className="flex-1">
                       <p className="font-bold text-primary">{newsItem.title}</p>
                       <p className="text-sm text-foreground/60">
-                        📅 {new Date(newsItem.date).toLocaleDateString()} | ✍️ {newsItem.author}
+                        �� {new Date(newsItem.date).toLocaleDateString()} | ✍️ {newsItem.author}
                       </p>
                       <p className="text-sm text-foreground/80 mt-2">{newsItem.content}</p>
                     </div>
