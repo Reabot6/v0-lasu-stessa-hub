@@ -3,16 +3,13 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-// Check if environment variables are set
 const isConfigured = !!(supabaseUrl && supabaseKey);
 
 console.log('[v0] Supabase URL:', supabaseUrl ? '✓ Set' : '✗ NOT SET');
 console.log('[v0] Supabase Key:', supabaseKey ? '✓ Set' : '✗ NOT SET');
-console.log('[v0] Supabase Configured:', isConfigured);
 
 if (!isConfigured) {
-  console.warn('[v0] ⚠️ WARNING: Supabase environment variables are not set!');
-  console.warn('[v0] Please add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to your .env.local file');
+  console.warn('[v0] ⚠️ Supabase not configured. Using fallback data.');
 }
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
@@ -51,7 +48,6 @@ export interface NewsItem {
   updated_at?: string;
 }
 
-// Fallback data for when database is unavailable (development/testing)
 const FALLBACK_COURSES: Course[] = [
   {
     id: '1',
@@ -113,39 +109,25 @@ const FALLBACK_NEWS: NewsItem[] = [
   },
 ];
 
-// Initialize function - no longer needed for Supabase but kept for compatibility
 export const initializeStorage = () => {
-  console.log('[v0] Storage initialized with Supabase');
+  console.log('[v0] Storage initialized');
 };
 
-// ============== FILE UPLOAD ==============
-
-export const uploadResourceFile = async (file: File, courseId: string): Promise<{ url: string; fileName: string; fileSize: number } | null> => {
+export const uploadResourceFile = async (
+  file: File,
+  courseId: string
+): Promise<{ url: string; fileName: string; fileSize: number } | null> => {
   try {
-    console.log('[v0] Starting file upload for:', file.name);
-    
-    // Create a unique file name with timestamp to avoid collisions
     const timestamp = Date.now();
     const fileName = `${courseId}/${timestamp}-${file.name}`;
-    
-    const { data, error } = await supabase
-      .storage
+
+    const { data, error } = await supabase.storage
       .from('resources')
-      .upload(fileName, file, {
-        cacheControl: '3600',
-        upsert: false,
-      });
+      .upload(fileName, file, { cacheControl: '3600', upsert: false });
 
-    if (error) {
-      console.error('[v0] Upload error:', error);
-      throw error;
-    }
+    if (error) throw error;
 
-    console.log('[v0] File uploaded successfully:', data);
-
-    // Get the public URL
-    const { data: publicUrlData } = supabase
-      .storage
+    const { data: publicUrlData } = supabase.storage
       .from('resources')
       .getPublicUrl(fileName);
 
@@ -155,41 +137,28 @@ export const uploadResourceFile = async (file: File, courseId: string): Promise<
       fileSize: file.size,
     };
   } catch (error) {
-    console.error('[v0] Error uploading file:', error);
+    console.error('[v0] Upload error:', error);
     return null;
   }
 };
 
 export const deleteResourceFile = async (filePath: string): Promise<boolean> => {
   try {
-    console.log('[v0] Deleting file:', filePath);
-    
-    const { error } = await supabase
-      .storage
+    const { error } = await supabase.storage
       .from('resources')
       .remove([filePath]);
 
-    if (error) {
-      console.error('[v0] Delete error:', error);
-      throw error;
-    }
-
-    console.log('[v0] File deleted successfully');
+    if (error) throw error;
     return true;
   } catch (error) {
-    console.error('[v0] Error deleting file:', error);
+    console.error('[v0] Delete file error:', error);
     return false;
   }
 };
 
-// ============== COURSES ==============
-
 export const getCourses = async (): Promise<Course[]> => {
   try {
-    if (!isSupabaseConfigured) {
-      console.warn('[v0] Supabase not configured. Using fallback data.');
-      return FALLBACK_COURSES;
-    }
+    if (!isSupabaseConfigured) return FALLBACK_COURSES;
 
     const { data, error } = await supabase
       .from('courses')
@@ -197,16 +166,13 @@ export const getCourses = async (): Promise<Course[]> => {
       .order('created_at', { ascending: false });
 
     if (error) {
-      if (error.code === 'PGRST205') {
-        console.warn('[v0] Tables not yet created. Run: pnpm migrate');
-        return FALLBACK_COURSES;
-      }
+      if (error.code === 'PGRST205') return FALLBACK_COURSES;
       throw error;
     }
-    
+
     return (data as Course[]) || [];
-  } catch (error: any) {
-    console.error('[v0] Error fetching courses:', error?.message || error);
+  } catch (error) {
+    console.error('[v0] Error fetching courses:', error);
     return FALLBACK_COURSES;
   }
 };
@@ -217,23 +183,25 @@ export const getCourseById = async (id: string): Promise<Course | undefined> => 
       .from('courses')
       .select('*')
       .eq('id', id)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
-    return data as Course;
+    return data as Course | undefined;
   } catch (error) {
     console.error('[v0] Error fetching course:', error);
     return undefined;
   }
 };
 
-export const addCourse = async (course: Omit<Course, 'id' | 'created_at' | 'updated_at'>): Promise<Course | null> => {
+export const addCourse = async (
+  course: Omit<Course, 'id' | 'created_at' | 'updated_at'>
+): Promise<Course | null> => {
   try {
     const { data, error } = await supabase
       .from('courses')
       .insert([course])
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data as Course;
@@ -243,14 +211,17 @@ export const addCourse = async (course: Omit<Course, 'id' | 'created_at' | 'upda
   }
 };
 
-export const updateCourse = async (id: string, updates: Partial<Course>): Promise<Course | null> => {
+export const updateCourse = async (
+  id: string,
+  updates: Partial<Course>
+): Promise<Course | null> => {
   try {
     const { data, error } = await supabase
       .from('courses')
       .update(updates)
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data as Course;
@@ -262,19 +233,8 @@ export const updateCourse = async (id: string, updates: Partial<Course>): Promis
 
 export const deleteCourse = async (id: string): Promise<boolean> => {
   try {
-    const { error: resourceError } = await supabase
-      .from('resources')
-      .delete()
-      .eq('course_id', id);
-
-    if (resourceError) throw resourceError;
-
-    const { error } = await supabase
-      .from('courses')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
+    await supabase.from('resources').delete().eq('course_id', id);
+    await supabase.from('courses').delete().eq('id', id);
     return true;
   } catch (error) {
     console.error('[v0] Error deleting course:', error);
@@ -282,14 +242,9 @@ export const deleteCourse = async (id: string): Promise<boolean> => {
   }
 };
 
-// ============== RESOURCES ==============
-
 export const getResources = async (): Promise<Resource[]> => {
   try {
-    if (!isSupabaseConfigured) {
-      console.warn('[v0] Supabase not configured. Using fallback data.');
-      return FALLBACK_RESOURCES;
-    }
+    if (!isSupabaseConfigured) return FALLBACK_RESOURCES;
 
     const { data, error } = await supabase
       .from('resources')
@@ -297,21 +252,20 @@ export const getResources = async (): Promise<Resource[]> => {
       .order('created_at', { ascending: false });
 
     if (error) {
-      if (error.code === 'PGRST205') {
-        console.warn('[v0] Tables not yet created. Run: pnpm migrate');
-        return FALLBACK_RESOURCES;
-      }
+      if (error.code === 'PGRST205') return FALLBACK_RESOURCES;
       throw error;
     }
-    
+
     return (data as Resource[]) || [];
-  } catch (error: any) {
-    console.error('[v0] Error fetching resources:', error?.message || error);
+  } catch (error) {
+    console.error('[v0] Error fetching resources:', error);
     return FALLBACK_RESOURCES;
   }
 };
 
-export const getResourcesByCourse = async (courseId: string): Promise<Resource[]> => {
+export const getResourcesByCourse = async (
+  courseId: string
+): Promise<Resource[]> => {
   try {
     const { data, error } = await supabase
       .from('resources')
@@ -327,13 +281,15 @@ export const getResourcesByCourse = async (courseId: string): Promise<Resource[]
   }
 };
 
-export const addResource = async (resource: Omit<Resource, 'id' | 'created_at' | 'updated_at'>): Promise<Resource | null> => {
+export const addResource = async (
+  resource: Omit<Resource, 'id' | 'created_at' | 'updated_at'>
+): Promise<Resource | null> => {
   try {
     const { data, error } = await supabase
       .from('resources')
       .insert([resource])
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data as Resource;
@@ -343,14 +299,17 @@ export const addResource = async (resource: Omit<Resource, 'id' | 'created_at' |
   }
 };
 
-export const updateResource = async (id: string, updates: Partial<Resource>): Promise<Resource | null> => {
+export const updateResource = async (
+  id: string,
+  updates: Partial<Resource>
+): Promise<Resource | null> => {
   try {
     const { data, error } = await supabase
       .from('resources')
       .update(updates)
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data as Resource;
@@ -362,11 +321,7 @@ export const updateResource = async (id: string, updates: Partial<Resource>): Pr
 
 export const deleteResource = async (id: string): Promise<boolean> => {
   try {
-    const { error } = await supabase
-      .from('resources')
-      .delete()
-      .eq('id', id);
-
+    const { error } = await supabase.from('resources').delete().eq('id', id);
     if (error) throw error;
     return true;
   } catch (error) {
@@ -375,7 +330,9 @@ export const deleteResource = async (id: string): Promise<boolean> => {
   }
 };
 
-export const deleteResourcesByCourse = async (courseId: string): Promise<boolean> => {
+export const deleteResourcesByCourse = async (
+  courseId: string
+): Promise<boolean> => {
   try {
     const { error } = await supabase
       .from('resources')
@@ -390,14 +347,9 @@ export const deleteResourcesByCourse = async (courseId: string): Promise<boolean
   }
 };
 
-// ============== NEWS ==============
-
 export const getNews = async (): Promise<NewsItem[]> => {
   try {
-    if (!isSupabaseConfigured) {
-      console.warn('[v0] Supabase not configured. Using fallback data.');
-      return FALLBACK_NEWS;
-    }
+    if (!isSupabaseConfigured) return FALLBACK_NEWS;
 
     const { data, error } = await supabase
       .from('news')
@@ -405,27 +357,26 @@ export const getNews = async (): Promise<NewsItem[]> => {
       .order('date', { ascending: false });
 
     if (error) {
-      if (error.code === 'PGRST205') {
-        console.warn('[v0] Tables not yet created. Run: pnpm migrate');
-        return FALLBACK_NEWS;
-      }
+      if (error.code === 'PGRST205') return FALLBACK_NEWS;
       throw error;
     }
-    
+
     return (data as NewsItem[]) || [];
-  } catch (error: any) {
-    console.error('[v0] Error fetching news:', error?.message || error);
+  } catch (error) {
+    console.error('[v0] Error fetching news:', error);
     return FALLBACK_NEWS;
   }
 };
 
-export const addNews = async (news: Omit<NewsItem, 'id' | 'created_at' | 'updated_at'>): Promise<NewsItem | null> => {
+export const addNews = async (
+  news: Omit<NewsItem, 'id' | 'created_at' | 'updated_at'>
+): Promise<NewsItem | null> => {
   try {
     const { data, error } = await supabase
       .from('news')
       .insert([news])
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data as NewsItem;
@@ -435,14 +386,17 @@ export const addNews = async (news: Omit<NewsItem, 'id' | 'created_at' | 'update
   }
 };
 
-export const updateNews = async (id: string, updates: Partial<NewsItem>): Promise<NewsItem | null> => {
+export const updateNews = async (
+  id: string,
+  updates: Partial<NewsItem>
+): Promise<NewsItem | null> => {
   try {
     const { data, error } = await supabase
       .from('news')
       .update(updates)
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data as NewsItem;
@@ -454,11 +408,7 @@ export const updateNews = async (id: string, updates: Partial<NewsItem>): Promis
 
 export const deleteNews = async (id: string): Promise<boolean> => {
   try {
-    const { error } = await supabase
-      .from('news')
-      .delete()
-      .eq('id', id);
-
+    const { error } = await supabase.from('news').delete().eq('id', id);
     if (error) throw error;
     return true;
   } catch (error) {
@@ -467,159 +417,10 @@ export const deleteNews = async (id: string): Promise<boolean> => {
   }
 };
 
-// ============== ADMIN ==============
-
-export const verifyAdmin = async (email: string, password: string): Promise<boolean> => {
-  if (email === 'stessaedu@gmail.com' && password === 'admin123stessa') {
-    return true;
-  }
-  return false;
-};
-
-export const setAdminSession = (token: string): void => {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem('stessa_admin_session', token);
-};
-
-export const getAdminSession = (): string | null => {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('stessa_admin_session');
-};
-
-export const clearAdminSession = (): void => {
-  if (typeof window === 'undefined') return;
-  localStorage.removeItem('stessa_admin_session');
-};
-
-export const isAdminLoggedIn = (): boolean => {
-  return !!getAdminSession();
-};
-      .single();
-
-    if (error) throw error;
-    return data as Resource;
-  } catch (error) {
-    console.error('[v0] Error updating resource:', error);
-    return null;
-  }
-};
-
-export const deleteResource = async (id: string): Promise<boolean> => {
-  try {
-    const { error } = await supabase
-      .from('resources')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
-    return true;
-  } catch (error) {
-    console.error('[v0] Error deleting resource:', error);
-    return false;
-  }
-};
-
-export const deleteResourcesByCourse = async (courseId: string): Promise<boolean> => {
-  try {
-    const { error } = await supabase
-      .from('resources')
-      .delete()
-      .eq('course_id', courseId);
-
-    if (error) throw error;
-    return true;
-  } catch (error) {
-    console.error('[v0] Error deleting resources by course:', error);
-    return false;
-  }
-};
-
-// ============== NEWS ==============
-
-export const getNews = async (): Promise<NewsItem[]> => {
-  try {
-    if (!isSupabaseConfigured) {
-      console.warn('[v0] Supabase not configured. Please set environment variables.');
-      return [];
-    }
-
-    console.log('[v0] Fetching news...');
-    const { data, error } = await supabase
-      .from('news')
-      .select('*')
-      .order('date', { ascending: false });
-
-    if (error) {
-      console.error('[v0] Supabase error getting news:', JSON.stringify(error, null, 2));
-      throw error;
-    }
-    
-    console.log('[v0] News fetched successfully:', data?.length || 0, 'items');
-    return (data as NewsItem[]) || [];
-  } catch (error: any) {
-    console.error('[v0] Error fetching news:', JSON.stringify(error, null, 2));
-    console.error('[v0] Error details:', {
-      message: error?.message,
-      code: error?.code,
-      status: error?.status,
-    });
-    return [];
-  }
-};
-
-export const addNews = async (news: Omit<NewsItem, 'id' | 'created_at' | 'updated_at'>): Promise<NewsItem | null> => {
-  try {
-    const { data, error } = await supabase
-      .from('news')
-      .insert([news])
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data as NewsItem;
-  } catch (error) {
-    console.error('[v0] Error adding news:', error);
-    return null;
-  }
-};
-
-export const updateNews = async (id: string, updates: Partial<NewsItem>): Promise<NewsItem | null> => {
-  try {
-    const { data, error } = await supabase
-      .from('news')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data as NewsItem;
-  } catch (error) {
-    console.error('[v0] Error updating news:', error);
-    return null;
-  }
-};
-
-export const deleteNews = async (id: string): Promise<boolean> => {
-  try {
-    const { error } = await supabase
-      .from('news')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
-    return true;
-  } catch (error) {
-    console.error('[v0] Error deleting news:', error);
-    return false;
-  }
-};
-
-// ============== ADMIN ==============
-
-export const verifyAdmin = async (email: string, password: string): Promise<boolean> => {
-  // For client-side verification, we'll use a simple check
-  // In production, this should be done server-side
+export const verifyAdmin = async (
+  email: string,
+  password: string
+): Promise<boolean> => {
   if (email === 'stessaedu@gmail.com' && password === 'admin123stessa') {
     return true;
   }
