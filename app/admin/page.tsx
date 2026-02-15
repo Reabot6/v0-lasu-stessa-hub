@@ -71,10 +71,11 @@ export default function AdminPage() {
 
     try {
       setSaving(true);
+      let result;
       if (editingId) {
-        await updateCourse(editingId, courseForm as Partial<Course>);
+        result = await updateCourse(editingId, courseForm as Partial<Course>);
       } else {
-        await addCourse({
+        result = await addCourse({
           title: courseForm.title,
           code: courseForm.code,
           department: courseForm.department,
@@ -82,12 +83,18 @@ export default function AdminPage() {
         } as Omit<Course, 'id' | 'created_at' | 'updated_at'>);
       }
 
+      if (!result) {
+        alert('Failed to save course. Please check the console for details and ensure Supabase is properly configured.');
+        return;
+      }
+
       setCourseForm({});
       setEditingId(null);
       await loadData();
+      alert('Course saved successfully!');
     } catch (error) {
       console.error('[v0] Error saving course:', error);
-      alert('Error saving course');
+      alert('Error saving course: ' + (error instanceof Error ? error.message : 'Unknown error'));
     } finally {
       setSaving(false);
     }
@@ -102,11 +109,16 @@ export default function AdminPage() {
     if (confirm('Are you sure you want to delete this course? Associated resources will also be deleted.')) {
       try {
         setSaving(true);
-        await deleteCourse(id);
+        const result = await deleteCourse(id);
+        if (!result) {
+          alert('Failed to delete course. Please check the console for details and ensure Supabase is properly configured.');
+          return;
+        }
         await loadData();
+        alert('Course deleted successfully!');
       } catch (error) {
         console.error('[v0] Error deleting course:', error);
-        alert('Error deleting course');
+        alert('Error deleting course: ' + (error instanceof Error ? error.message : 'Unknown error'));
       } finally {
         setSaving(false);
       }
@@ -122,10 +134,11 @@ export default function AdminPage() {
 
     try {
       setSaving(true);
+      let result;
       if (editingId) {
-        await updateResource(editingId, resourceForm as Partial<Resource>);
+        result = await updateResource(editingId, resourceForm as Partial<Resource>);
       } else {
-        await addResource({
+        result = await addResource({
           title: resourceForm.title,
           course_id: resourceForm.course_id,
           type: resourceForm.type as 'pdf' | 'video' | 'document' | 'link',
@@ -134,12 +147,18 @@ export default function AdminPage() {
         } as Omit<Resource, 'id' | 'created_at' | 'updated_at'>);
       }
 
+      if (!result) {
+        alert('Failed to save resource. Please check the console for details and ensure Supabase is properly configured.');
+        return;
+      }
+
       setResourceForm({});
       setEditingId(null);
       await loadData();
+      alert('Resource saved successfully!');
     } catch (error) {
       console.error('[v0] Error saving resource:', error);
-      alert('Error saving resource');
+      alert('Error saving resource: ' + (error instanceof Error ? error.message : 'Unknown error'));
     } finally {
       setSaving(false);
     }
@@ -154,11 +173,16 @@ export default function AdminPage() {
     if (confirm('Are you sure you want to delete this resource?')) {
       try {
         setSaving(true);
-        await deleteResource(id);
+        const result = await deleteResource(id);
+        if (!result) {
+          alert('Failed to delete resource. Please check the console for details and ensure Supabase is properly configured.');
+          return;
+        }
         await loadData();
+        alert('Resource deleted successfully!');
       } catch (error) {
         console.error('[v0] Error deleting resource:', error);
-        alert('Error deleting resource');
+        alert('Error deleting resource: ' + (error instanceof Error ? error.message : 'Unknown error'));
       } finally {
         setSaving(false);
       }
@@ -174,10 +198,11 @@ export default function AdminPage() {
 
     try {
       setSaving(true);
+      let result;
       if (editingId) {
-        await updateNews(editingId, newsForm as Partial<NewsItem>);
+        result = await updateNews(editingId, newsForm as Partial<NewsItem>);
       } else {
-        await addNews({
+        result = await addNews({
           title: newsForm.title,
           content: newsForm.content,
           date: newsForm.date || new Date().toISOString().split('T')[0],
@@ -185,12 +210,18 @@ export default function AdminPage() {
         } as Omit<NewsItem, 'id' | 'created_at' | 'updated_at'>);
       }
 
+      if (!result) {
+        alert('Failed to save news. Please check the console for details and ensure Supabase is properly configured.');
+        return;
+      }
+
       setNewsForm({});
       setEditingId(null);
       await loadData();
+      alert('News saved successfully!');
     } catch (error) {
       console.error('[v0] Error saving news:', error);
-      alert('Error saving news');
+      alert('Error saving news: ' + (error instanceof Error ? error.message : 'Unknown error'));
     } finally {
       setSaving(false);
     }
@@ -205,11 +236,16 @@ export default function AdminPage() {
     if (confirm('Are you sure you want to delete this news item?')) {
       try {
         setSaving(true);
-        await deleteNews(id);
+        const result = await deleteNews(id);
+        if (!result) {
+          alert('Failed to delete news. Please check the console for details and ensure Supabase is properly configured.');
+          return;
+        }
         await loadData();
+        alert('News deleted successfully!');
       } catch (error) {
         console.error('[v0] Error deleting news:', error);
-        alert('Error deleting news');
+        alert('Error deleting news: ' + (error instanceof Error ? error.message : 'Unknown error'));
       } finally {
         setSaving(false);
       }
