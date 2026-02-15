@@ -233,11 +233,30 @@ export const updateCourse = async (
 
 export const deleteCourse = async (id: string): Promise<boolean> => {
   try {
-    await supabase.from('resources').delete().eq('course_id', id);
-    await supabase.from('courses').delete().eq('id', id);
+    // Delete associated resources first
+    const { error: resourceError } = await supabase.from('resources').delete().eq('course_id', id);
+    if (resourceError) {
+      console.error('[v0] Error deleting course resources:', {
+        code: resourceError.code,
+        message: resourceError.message,
+        status: (resourceError as any).status,
+      });
+      throw resourceError;
+    }
+
+    // Then delete the course
+    const { error } = await supabase.from('courses').delete().eq('id', id);
+    if (error) {
+      console.error('[v0] Error deleting course:', {
+        code: error.code,
+        message: error.message,
+        status: (error as any).status,
+      });
+      throw error;
+    }
     return true;
-  } catch (error) {
-    console.error('[v0] Error deleting course:', error);
+  } catch (error: any) {
+    console.error('[v0] Failed to delete course:', error?.message || 'Unknown error');
     return false;
   }
 };
@@ -322,10 +341,17 @@ export const updateResource = async (
 export const deleteResource = async (id: string): Promise<boolean> => {
   try {
     const { error } = await supabase.from('resources').delete().eq('id', id);
-    if (error) throw error;
+    if (error) {
+      console.error('[v0] Error deleting resource:', {
+        code: error.code,
+        message: error.message,
+        status: (error as any).status,
+      });
+      throw error;
+    }
     return true;
-  } catch (error) {
-    console.error('[v0] Error deleting resource:', error);
+  } catch (error: any) {
+    console.error('[v0] Failed to delete resource:', error?.message || 'Unknown error');
     return false;
   }
 };
@@ -334,15 +360,18 @@ export const deleteResourcesByCourse = async (
   courseId: string
 ): Promise<boolean> => {
   try {
-    const { error } = await supabase
-      .from('resources')
-      .delete()
-      .eq('course_id', courseId);
-
-    if (error) throw error;
+    const { error } = await supabase.from('resources').delete().eq('course_id', courseId);
+    if (error) {
+      console.error('[v0] Error deleting resources by course:', {
+        code: error.code,
+        message: error.message,
+        status: (error as any).status,
+      });
+      throw error;
+    }
     return true;
-  } catch (error) {
-    console.error('[v0] Error deleting resources by course:', error);
+  } catch (error: any) {
+    console.error('[v0] Failed to delete resources by course:', error?.message || 'Unknown error');
     return false;
   }
 };
@@ -409,10 +438,17 @@ export const updateNews = async (
 export const deleteNews = async (id: string): Promise<boolean> => {
   try {
     const { error } = await supabase.from('news').delete().eq('id', id);
-    if (error) throw error;
+    if (error) {
+      console.error('[v0] Error deleting news:', {
+        code: error.code,
+        message: error.message,
+        status: (error as any).status,
+      });
+      throw error;
+    }
     return true;
-  } catch (error) {
-    console.error('[v0] Error deleting news:', error);
+  } catch (error: any) {
+    console.error('[v0] Failed to delete news:', error?.message || 'Unknown error');
     return false;
   }
 };
