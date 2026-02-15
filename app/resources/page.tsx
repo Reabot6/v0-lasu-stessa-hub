@@ -3,11 +3,11 @@
 import { useState, useEffect } from 'react';
 import { Navigation } from '@/components/navigation';
 import { ResourcesContent } from '@/components/resources-content';
-import { getResources, getCourses, isAdminLoggedIn } from '@/lib/storage';
+import { getResources, getCourses, Resource, Course, isAdminLoggedIn } from '@/lib/storage';
 
 export default function ResourcesPage() {
-  const [resources, setResources] = useState([]);
-  const [courses, setCourses] = useState([]);
+  const [resources, setResources] = useState<Resource[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
