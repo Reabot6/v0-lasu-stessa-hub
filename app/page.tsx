@@ -303,7 +303,7 @@ export default function Home() {
               Reabot6
             </a>
             {' '}
-            (onimisiadeolu@gmail.com)
+
           </p>
         </div>
       </footer>
