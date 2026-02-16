@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Navigation } from '@/components/navigation';
+import { ScrollObserver } from '@/components/scroll-observer';
 import { initializeStorage } from '@/lib/storage';
 
 export default function Home() {
@@ -71,7 +72,8 @@ export default function Home() {
       </section>
 
       {/* Vice Chancellor's Welcome – styled like the reference */}
-      <section className="py-16 md:py-20 bg-gradient-to-br from-card via-card to-background/80 relative overflow-hidden">
+      <ScrollObserver>
+        <section className="py-16 md:py-20 bg-gradient-to-br from-card via-card to-background/80 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Left: Text content */}
@@ -123,9 +125,11 @@ export default function Home() {
           </div>
         </div>
       </section>
+      </ScrollObserver>
 
       {/* Faculty of Education */}
-      <section className="py-12 sm:py-16 bg-background">
+      <ScrollObserver>
+        <section className="py-12 sm:py-16 bg-background">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8 items-start">
             <div className="flex justify-center md:order-2">
@@ -154,9 +158,11 @@ export default function Home() {
           </div>
         </div>
       </section>
+      </ScrollObserver>
 
       {/* Department of Science and Technology Education */}
-      <section className="py-12 sm:py-16 bg-card border-b border-border">
+      <ScrollObserver>
+        <section className="py-12 sm:py-16 bg-card border-b border-border">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8 items-start">
             <div className="flex justify-center">
@@ -195,9 +201,11 @@ export default function Home() {
           </div>
         </div>
       </section>
+      </ScrollObserver>
 
       {/* Our Catalogue – demure & detailed services overview */}
-      <section className="py-16 md:py-20 bg-background">
+      <ScrollObserver>
+        <section className="py-16 md:py-20 bg-background">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
           <div className="text-center mb-14 md:mb-16 space-y-4">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-primary tracking-tight">
@@ -277,6 +285,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      </ScrollObserver>
 
       {/* LASU Motto Footer Banner */}
       <div className="bg-accent text-primary font-semibold text-center py-4 shadow-inner">
