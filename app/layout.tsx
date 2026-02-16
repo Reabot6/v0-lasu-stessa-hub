@@ -6,8 +6,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'LASU STESSA Resource Hub',
-  description: 'Access courses, resources, and announcements for STESSA department',
+  title: 'LASU STESA Resource Hub - Science, Technology, Engineering and Skills Services for Africa',
+  description: 'Access courses, resources, and announcements for STESA department. LASU Science and Technology Education',
   generator: 'v0.app',
   icons: {
     icon: [
