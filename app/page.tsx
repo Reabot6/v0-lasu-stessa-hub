@@ -182,9 +182,11 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 text-center">
           <p className="opacity-80">
             &copy; 2024 LASU STESSA. All rights reserved.
- made with ❤️ for Lasuites by{" "}
-      <a href="mailto:onimisiadeolu@gmail.com">
-        reabot6
+            <br />
+            Made with ❤️ for Lasuites by{" "}
+            <a href="mailto:onimisiadeolu@gmail.com" className="underline hover:opacity-70">
+              reabot6
+            </a>
           </p>
         </div>
       </footer>
