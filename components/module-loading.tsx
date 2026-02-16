@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 
 interface ModuleLoadingProps {
-  type: 'resources' | 'news' | 'academics';
+  moduleType: 'resources' | 'news' | 'academics';
 }
 
 const moduleMessages = {
@@ -24,16 +24,17 @@ const moduleMessages = {
   ],
 };
 
-export function ModuleLoading({ type }: ModuleLoadingProps) {
+export function ModuleLoading({ moduleType }: ModuleLoadingProps) {
   const [messageIndex, setMessageIndex] = useState(0);
-  const messages = moduleMessages[type];
+  const messages = moduleMessages[moduleType];
+  const messageCount = messages.length;
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setMessageIndex((prev) => (prev + 1) % messages.length);
+      setMessageIndex((prev) => (prev + 1) % messageCount);
     }, 2000);
     return () => clearInterval(interval);
-  }, [messages.length]);
+  }, [messageCount]);
 
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4">
@@ -84,8 +85,8 @@ export function ModuleLoading({ type }: ModuleLoadingProps) {
 
       {/* Module Type Badge */}
       <div className="mb-6">
-        <span className="badge-primary px-4 py-2 capitalize text-sm font-bold">
-          Loading {type}
+        <span className="px-4 py-2 capitalize text-sm font-bold bg-primary text-primary-foreground rounded-full">
+          Loading {moduleType}
         </span>
       </div>
 
