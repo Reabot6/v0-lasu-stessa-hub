@@ -56,17 +56,7 @@ export default function Home() {
                 </Link>
               </div>
             </div>
-            <div className="hidden md:block">
-              <div className="relative w-full h-80">
-                <Image
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-NFYOghHtnv4zOUbaOGVVLHh1JJIiao.png"
-                  alt="Vice Chancellor Prof. Ibiyemi Olatunji-Bello"
-                  fill
-                  className="object-contain"
-                  priority
-                />
-              </div>
-            </div>
+
           </div>
         </div>
       </section>
@@ -173,7 +163,7 @@ export default function Home() {
           <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">
             Our Services
           </h2>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             {/* Academics Card */}
             <div className="resource-card hover:shadow-lg transition">
