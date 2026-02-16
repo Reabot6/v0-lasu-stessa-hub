@@ -267,7 +267,7 @@ export default function Home() {
               className="text-accent hover:text-accent/80 font-medium transition-colors underline underline-offset-2"
             >
               reabot6
-            </a>{' '}
+            </a>
 
           </p>
         </div>
