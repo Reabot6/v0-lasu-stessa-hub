@@ -17,49 +17,22 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       <Navigation />
 
-      {/* Hero Carousel */}
-      <section className="w-full px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10 bg-gradient-to-b from-primary/10 to-background">
-        <div className="max-w-6xl mx-auto">
-          <HeroCarousel />
-        </div>
-      </section>
-
-      {/* Hero Section */}
-      {/* Hero Section – with motto as background overlay */}
-      <section className="relative bg-primary text-primary-foreground overflow-hidden min-h-[60vh] flex items-center">
-        {/* Background layer: subtle campus image or gradient + motto text */}
+      {/* Hero Section with Carousel Background */}
+      <section className="relative overflow-hidden min-h-[70vh] sm:min-h-[80vh] md:min-h-[90vh] flex items-center justify-center">
+        {/* Carousel Background */}
         <div className="absolute inset-0 z-0">
-          {/* Dark overlay for contrast */}
-          <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-primary/70" />
-
-          {/* Large centered motto text as watermark */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none select-none">
-            <h2 className="text-[8rem] sm:text-[12rem] md:text-[16rem] lg:text-[20rem] font-black leading-none tracking-tighter text-accent/30 rotate-[-5deg]">
-              WE ARE LASU<br />WE ARE GREAT
-            </h2>
-          </div>
-
-          {/* Smaller repeated version for subtle texture */}
-          <div className="absolute inset-0 opacity-5 pointer-events-none select-none overflow-hidden">
-            <div className="absolute inset-0 grid grid-cols-3 gap-8 rotate-[-3deg] scale-125">
-              {Array.from({ length: 9 }).map((_, i) => (
-                <p key={i} className="text-4xl font-bold text-accent/20 whitespace-nowrap">
-                  WE ARE LASU • WE ARE GREAT
-                </p>
-              ))}
-            </div>
-          </div>
+          <HeroCarousel isBackground={true} />
         </div>
 
-        {/* Foreground content */}
+        {/* Foreground Content */}
         <div className="relative z-10 max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 py-20 md:py-28 text-center">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 tracking-tight drop-shadow-md">
-            Welcome to STE
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 tracking-tight drop-shadow-lg text-white">
+            Welcome to STESA
           </h1>
-          <p className="text-xl sm:text-2xl md:text-3xl opacity-95 mb-6 font-medium">
+          <p className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 drop-shadow-md text-accent">
             Science and Technology Education
           </p>
-          <p className="text-lg sm:text-xl opacity-85 mb-10 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg sm:text-xl opacity-95 mb-10 max-w-3xl mx-auto leading-relaxed text-white drop-shadow-md">
             Your comprehensive hub for accessing courses, learning resources, and staying updated with departmental announcements.
           </p>
           <div className="flex flex-col sm:flex-row gap-5 justify-center">
@@ -67,6 +40,17 @@ export default function Home() {
               href="/academics"
               className="inline-flex items-center justify-center px-8 py-4 bg-accent text-primary font-bold text-lg rounded-lg shadow-lg hover:bg-accent/90 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
             >
+              Explore Courses
+            </Link>
+            <Link
+              href="/resources"
+              className="inline-flex items-center justify-center px-8 py-4 bg-primary text-primary-foreground font-bold text-lg rounded-lg shadow-lg hover:bg-secondary hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-primary-foreground"
+            >
+              Browse Resources
+            </Link>
+          </div>
+        </div>
+      </section>
               Explore Courses
             </Link>
             <Link

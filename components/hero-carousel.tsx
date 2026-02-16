@@ -27,7 +27,11 @@ const slides: CarouselSlide[] = [
   },
 ];
 
-export function HeroCarousel() {
+interface HeroCarouselProps {
+  isBackground?: boolean;
+}
+
+export function HeroCarousel({ isBackground = false }: HeroCarouselProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlay, setIsAutoPlay] = useState(true);
 
@@ -60,8 +64,12 @@ export function HeroCarousel() {
     setTimeout(() => setIsAutoPlay(true), 10000);
   };
 
+  const containerClasses = isBackground
+    ? 'relative w-full h-full'
+    : 'relative w-full h-64 sm:h-80 md:h-96 lg:h-[500px] overflow-hidden rounded-2xl shadow-2xl group bg-black';
+
   return (
-    <div className="relative w-full h-64 sm:h-80 md:h-96 lg:h-[500px] overflow-hidden rounded-2xl shadow-2xl group bg-black">
+    <div className={containerClasses}>
       {/* Slides */}
       <div className="relative w-full h-full">
         {slides.map((slide, index) => (
@@ -70,7 +78,7 @@ export function HeroCarousel() {
             className={`absolute inset-0 transition-all duration-700 ease-in-out ${
               index === currentSlide
                 ? 'opacity-100 scale-100'
-                : 'opacity-0 scale-95'
+                : 'opacity-0 scale-105'
             }`}
           >
             <Image
@@ -81,8 +89,8 @@ export function HeroCarousel() {
               priority={index === 0}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 100vw"
             />
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+            {/* Gradient overlay - darker for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-br from-black/50 via-black/40 to-primary/60" />
           </div>
         ))}
       </div>
@@ -90,7 +98,7 @@ export function HeroCarousel() {
       {/* Navigation Arrows */}
       <button
         onClick={prevSlide}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/40 text-white rounded-full p-2 md:p-3 transition-all duration-300 backdrop-blur-sm group-hover:opacity-100 opacity-60"
+        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/40 text-white rounded-full p-2 md:p-3 transition-all duration-300 backdrop-blur-sm opacity-60 hover:opacity-100"
         aria-label="Previous slide"
       >
         <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -100,7 +108,7 @@ export function HeroCarousel() {
 
       <button
         onClick={nextSlide}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/40 text-white rounded-full p-2 md:p-3 transition-all duration-300 backdrop-blur-sm group-hover:opacity-100 opacity-60"
+        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/40 text-white rounded-full p-2 md:p-3 transition-all duration-300 backdrop-blur-sm opacity-60 hover:opacity-100"
         aria-label="Next slide"
       >
         <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
