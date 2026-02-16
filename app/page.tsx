@@ -78,7 +78,7 @@ export default function Home() {
             <div className="flex justify-center md:block">
               <div className="relative w-48 h-64">
                 <Image
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/https://lasu.edu.ng/home/img/our_vc.png"
+                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/home/img/our_vc.png"
                   alt="Vice Chancellor"
                   fill
                   className="object-cover rounded-lg"
