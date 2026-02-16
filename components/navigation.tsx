@@ -28,6 +28,17 @@ export function Navigation() {
 
   return (
     <>
+      {/* Repeating "We are LASU We are Great" Header */}
+      <div className="bg-primary text-primary-foreground overflow-hidden py-2 sm:py-3">
+        <div className="animate-scroll whitespace-nowrap flex">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <span key={i} className="inline-block text-lg sm:text-xl md:text-2xl font-bold px-8">
+              We are LASU We are Great
+            </span>
+          ))}
+        </div>
+      </div>
+
       <nav className="bg-primary text-primary-foreground shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">

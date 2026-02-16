@@ -6,25 +6,36 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'LASU STESA Resource Hub',
-  description: 'Access courses, resources, and announcements for STESSA department',
+  title: 'LASU STESA - Science & Technology Education Hub',
+  description: 'Lagos State University Science, Technology, Engineering and Skills Services for Africa. Access courses, resources, and announcements.',
   generator: 'v0.app',
+  keywords: 'LASU, STESA, Science Education, Technology Education, Lagos State University',
+  authors: [{ name: 'LASU STESA' }],
   icons: {
-    icon: [
+    icon: '/lasu-logo.png',
+    apple: '/lasu-logo.png',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://stesa.lasu.edu.ng',
+    siteName: 'LASU STESA Resource Hub',
+    title: 'LASU STESA - Science & Technology Education Hub',
+    description: 'Science, Technology, Engineering and Skills Services for Africa',
+    images: [
       {
-        url: 'https://lasu.edu.ng/home/img/logo1.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: 'https://lasu.edu.ng/home/img/logo1.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: 'https://lasu.edu.ng/home/img/logo1.png',
-        type: 'image/svg+xml',
+        url: '/lasu-logo.png',
+        width: 1200,
+        height: 630,
+        alt: 'LASU STESA Logo',
       },
     ],
-    apple: 'https://lasu.edu.ng/home/img/logo1.png',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'LASU STESA - Science & Technology Education Hub',
+    description: 'Science, Technology, Engineering and Skills Services for Africa',
+    images: ['/lasu-logo.png'],
   },
 }
 
