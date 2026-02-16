@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Navigation } from '@/components/navigation';
 import { ScrollObserver } from '@/components/scroll-observer';
+import { HeroCarousel } from '@/components/hero-carousel';
 import { initializeStorage } from '@/lib/storage';
 
 export default function Home() {
@@ -15,6 +16,13 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+
+      {/* Hero Carousel */}
+      <section className="w-full px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10 bg-gradient-to-b from-primary/10 to-background">
+        <div className="max-w-6xl mx-auto">
+          <HeroCarousel />
+        </div>
+      </section>
 
       {/* Hero Section */}
       {/* Hero Section – with motto as background overlay */}
