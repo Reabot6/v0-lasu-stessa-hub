@@ -6,25 +6,25 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'LASU STESSA Resource Hub',
+  title: 'LASU STESA Resource Hub',
   description: 'Access courses, resources, and announcements for STESSA department',
   generator: 'v0.app',
   icons: {
     icon: [
       {
-        url: '/icon-light-32x32.png',
+        url: 'https://lasu.edu.ng/home/img/logo1.png',
         media: '(prefers-color-scheme: light)',
       },
       {
-        url: '/icon-dark-32x32.png',
+        url: 'https://lasu.edu.ng/home/img/logo1.png',
         media: '(prefers-color-scheme: dark)',
       },
       {
-        url: '/icon.svg',
+        url: 'https://lasu.edu.ng/home/img/logo1.png',
         type: 'image/svg+xml',
       },
     ],
-    apple: '/apple-icon.png',
+    apple: 'https://lasu.edu.ng/home/img/logo1.png',
   },
 }
 
