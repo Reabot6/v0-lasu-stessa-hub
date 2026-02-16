@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { Navigation } from '@/components/navigation';
 import { ScrollObserver } from '@/components/scroll-observer';
 import { HeroCarousel } from '@/components/hero-carousel';
+import { AnimateOnScroll, ParallaxImage, CountUp } from '@/components/advanced-scroll-animation';
+import { BentoGrid, BentoGridItem, FeatureCard } from '@/components/bento-grid';
 import { initializeStorage } from '@/lib/storage';
 
 export default function Home() {
@@ -26,29 +28,40 @@ export default function Home() {
 
         {/* Foreground Content */}
         <div className="relative z-10 max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 py-20 md:py-28 text-center">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 tracking-tight drop-shadow-lg text-white">
-            Welcome to STESA
-          </h1>
-          <p className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 drop-shadow-md text-accent">
-            Science and Technology Education
-          </p>
-          <p className="text-lg sm:text-xl opacity-95 mb-10 max-w-3xl mx-auto leading-relaxed text-white drop-shadow-md">
-            Your comprehensive hub for accessing courses, learning resources, and staying updated with departmental announcements.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-5 justify-center">
-            <Link
-              href="/academics"
-              className="inline-flex items-center justify-center px-8 py-4 bg-accent text-primary font-bold text-lg rounded-lg shadow-lg hover:bg-accent/90 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-            >
-              Explore Courses
-            </Link>
-            <Link
-              href="/resources"
-              className="inline-flex items-center justify-center px-8 py-4 bg-primary text-primary-foreground font-bold text-lg rounded-lg shadow-lg hover:bg-secondary hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-primary-foreground"
-            >
-              Browse Resources
-            </Link>
-          </div>
+          <AnimateOnScroll animationType="fadeUp" duration={0.8}>
+            <h1 className="text-hero mb-6 drop-shadow-lg text-white animate-float-in">
+              Welcome to STESA
+            </h1>
+          </AnimateOnScroll>
+          
+          <AnimateOnScroll animationType="fadeUp" duration={0.8} delay={0.2}>
+            <p className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 drop-shadow-md text-accent">
+              Science and Technology Education
+            </p>
+          </AnimateOnScroll>
+          
+          <AnimateOnScroll animationType="fadeUp" duration={0.8} delay={0.4}>
+            <p className="text-lg sm:text-xl opacity-95 mb-10 max-w-3xl mx-auto leading-relaxed text-white drop-shadow-md">
+              Your comprehensive hub for accessing courses, learning resources, and staying updated with departmental announcements.
+            </p>
+          </AnimateOnScroll>
+          
+          <AnimateOnScroll animationType="scale" duration={0.8} delay={0.6}>
+            <div className="flex flex-col sm:flex-row gap-5 justify-center">
+              <Link
+                href="/academics"
+                className="btn-cta inline-flex items-center justify-center px-8 py-4 font-bold text-lg"
+              >
+                Explore Courses
+              </Link>
+              <Link
+                href="/resources"
+                className="inline-flex items-center justify-center px-8 py-4 glass-card text-primary-foreground font-bold text-lg rounded-full hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+              >
+                Browse Resources
+              </Link>
+            </div>
+          </AnimateOnScroll>
         </div>
       </section>
 
@@ -184,88 +197,86 @@ export default function Home() {
       </section>
       </ScrollObserver>
 
-      {/* Our Catalogue – demure & detailed services overview */}
+      {/* Our Catalogue – Bento Grid Layout */}
       <ScrollObserver>
-        <section className="py-16 md:py-20 bg-background">
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
-          <div className="text-center mb-14 md:mb-16 space-y-4">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-primary tracking-tight">
-              Our Catalogue
-            </h2>
-            <p className="text-lg md:text-xl text-foreground/70 max-w-3xl mx-auto">
-              Discover the core offerings of STESSA — from structured academic programs to rich learning materials and timely departmental updates.
-            </p>
+        <section className="py-20 md:py-28 bg-gradient-to-b from-background to-primary/5">
+          <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+            <AnimateOnScroll animationType="fadeUp" className="text-center mb-16 md:mb-20">
+              <h2 className="text-section-title gradient-text mb-6">Our Catalogue</h2>
+              <p className="text-section-subtitle">
+                Discover the core offerings of STESSA — from structured academic programs to rich learning materials and timely departmental updates.
+              </p>
+            </AnimateOnScroll>
+
+            <BentoGrid>
+              {/* Academics Card - Highlight */}
+              <AnimateOnScroll animationType="revealLeft">
+                <BentoGridItem span="half" highlight>
+                  <div className="space-y-6">
+                    <div className="text-6xl">📚</div>
+                    <div>
+                      <h3 className="text-3xl font-bold text-primary mb-3">Academics</h3>
+                      <p className="text-foreground/80 leading-relaxed mb-6">
+                        Explore our full curriculum across departments including Biology Education, Chemistry, Computer Science, Educational Technology, Mathematics, and Physics Education. View detailed course descriptions and learning outcomes.
+                      </p>
+                    </div>
+                    <Link
+                      href="/academics"
+                      className="inline-flex items-center gap-2 text-accent font-bold hover:text-accent/80 transition-colors group"
+                    >
+                      View Full Course Catalogue
+                      <span className="group-hover:translate-x-1 transition-transform">→</span>
+                    </Link>
+                  </div>
+                </BentoGridItem>
+              </AnimateOnScroll>
+
+              {/* Resources Card */}
+              <AnimateOnScroll animationType="fadeUp" delay={0.2}>
+                <BentoGridItem span="third">
+                  <div className="space-y-6">
+                    <div className="text-5xl">📖</div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-primary mb-3">Learning Resources</h3>
+                      <p className="text-foreground/80 leading-relaxed mb-6 text-sm">
+                        Curated educational materials including lecture notes, videos, research papers, laboratory guides, and past exams.
+                      </p>
+                    </div>
+                    <Link
+                      href="/resources"
+                      className="inline-flex items-center gap-2 text-accent font-semibold hover:text-accent/80 transition-colors group"
+                    >
+                      Browse
+                      <span className="group-hover:translate-x-1 transition-transform">→</span>
+                    </Link>
+                  </div>
+                </BentoGridItem>
+              </AnimateOnScroll>
+
+              {/* News Card */}
+              <AnimateOnScroll animationType="revealRight" delay={0.4}>
+                <BentoGridItem span="third">
+                  <div className="space-y-6">
+                    <div className="text-5xl">📰</div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-primary mb-3">News & Updates</h3>
+                      <p className="text-foreground/80 leading-relaxed mb-6 text-sm">
+                        Stay informed with official announcements, event schedules, seminars, examination timetables, and faculty achievements.
+                      </p>
+                    </div>
+                    <Link
+                      href="/news"
+                      className="inline-flex items-center gap-2 text-accent font-semibold hover:text-accent/80 transition-colors group"
+                    >
+                      Updates
+                      <span className="group-hover:translate-x-1 transition-transform">→</span>
+                    </Link>
+                  </div>
+                </BentoGridItem>
+              </AnimateOnScroll>
+            </BentoGrid>
           </div>
-
-          <div className="grid md:grid-cols-3 gap-8 lg:gap-10">
-            {/* Academics Card */}
-            <div className="group bg-card rounded-2xl border border-border/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-              <div className="p-8 md:p-10 space-y-6">
-                <div className="text-accent text-5xl md:text-6xl opacity-90 group-hover:opacity-100 transition-opacity">
-                  📚
-                </div>
-                <div className="space-y-3">
-                  <h3 className="text-2xl font-semibold text-primary">Academics</h3>
-                  <p className="text-foreground/75 leading-relaxed">
-                    Explore our full curriculum across departments including Biology Education, Chemistry, Computer Science, Educational Technology, Mathematics, and Physics Education. View detailed course descriptions, codes, learning outcomes, prerequisites, and semester structures.
-                  </p>
-                </div>
-                <Link
-                  href="/academics"
-                  className="inline-flex items-center gap-2 text-primary font-medium hover:text-accent transition-colors"
-                >
-                  View Full Course Catalogue
-                  <span aria-hidden="true">→</span>
-                </Link>
-              </div>
-            </div>
-
-            {/* Resources Card */}
-            <div className="group bg-card rounded-2xl border border-border/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-              <div className="p-8 md:p-10 space-y-6">
-                <div className="text-accent text-5xl md:text-6xl opacity-90 group-hover:opacity-100 transition-opacity">
-                  📖
-                </div>
-                <div className="space-y-3">
-                  <h3 className="text-2xl font-semibold text-primary">Learning Resources</h3>
-                  <p className="text-foreground/75 leading-relaxed">
-                    Access a curated collection of high-quality educational materials: lecture notes, instructional videos, research papers, laboratory guides, past examination questions, recommended textbooks, and external reference links — all organized by course and unit for easy navigation.
-                  </p>
-                </div>
-                <Link
-                  href="/resources"
-                  className="inline-flex items-center gap-2 text-primary font-medium hover:text-accent transition-colors"
-                >
-                  Browse All Resources
-                  <span aria-hidden="true">→</span>
-                </Link>
-              </div>
-            </div>
-
-            {/* News & Updates Card */}
-            <div className="group bg-card rounded-2xl border border-border/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-              <div className="p-8 md:p-10 space-y-6">
-                <div className="text-accent text-5xl md:text-6xl opacity-90 group-hover:opacity-100 transition-opacity">
-                  📰
-                </div>
-                <div className="space-y-3">
-                  <h3 className="text-2xl font-semibold text-primary">News & Department Updates</h3>
-                  <p className="text-foreground/75 leading-relaxed">
-                    Stay informed with official announcements, event schedules, seminar notices, examination timetables, faculty achievements, student opportunities, important deadlines, and departmental circulars — regularly updated to keep our community connected and prepared.
-                  </p>
-                </div>
-                <Link
-                  href="/news"
-                  className="inline-flex items-center gap-2 text-primary font-medium hover:text-accent transition-colors"
-                >
-                  Read Latest Updates
-                  <span aria-hidden="true">→</span>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
       </ScrollObserver>
 
       {/* LASU Motto Footer Banner */}
