@@ -3,6 +3,19 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 20s linear infinite;
+}
+
 :root {
   /* Warm earthy palette for LASU STESSA */
   --background: oklch(0.98 0 0);
