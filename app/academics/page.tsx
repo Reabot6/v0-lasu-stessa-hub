@@ -102,7 +102,7 @@ export default function AcademicsPage() {
       <footer className="bg-primary text-primary-foreground py-8">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <p className="opacity-80">
-            &copy; 2024 LASU STESSA. All rights reserved.
+            &copy; 2026 LASU STE. All rights reserved.
           </p>
         </div>
       </footer>

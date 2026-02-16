@@ -77,7 +77,7 @@ export default function NewsPage() {
                   <div className="flex justify-between items-start gap-4 mb-3">
                     <h2 className="text-2xl font-bold text-primary flex-1">{item.title}</h2>
                   </div>
-                  
+
                   <div className="flex items-center gap-4 text-sm text-foreground/60 mb-4">
                     <span>📅 {formatDate(item.date)}</span>
                     <span>✍️ {item.author}</span>
@@ -108,7 +108,7 @@ export default function NewsPage() {
       <footer className="bg-primary text-primary-foreground py-8">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <p className="opacity-80">
-            &copy; 2024 LASU STESSA. All rights reserved.
+            &copy; 2024 LASU STE. All rights reserved.
           </p>
         </div>
       </footer>

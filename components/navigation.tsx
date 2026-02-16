@@ -44,7 +44,7 @@ export function Navigation() {
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link href="/" className="font-bold text-lg sm:text-xl hover:opacity-90 transition">
-              STESA Hub
+              STE Hub
             </Link>
 
             {/* Desktop Navigation */}

@@ -45,7 +45,7 @@ export default function Home() {
         {/* Foreground content */}
         <div className="relative z-10 max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 py-20 md:py-28 text-center">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 tracking-tight drop-shadow-md">
-            Welcome to STESA
+            Welcome to STE
           </h1>
           <p className="text-xl sm:text-2xl md:text-3xl opacity-95 mb-6 font-medium">
             Science and Technology Education
@@ -131,8 +131,9 @@ export default function Home() {
             <div className="flex justify-center md:order-2">
               <div className="relative w-48 h-64">
                 <Image
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-Y5m5ft6lOPdMmx0pDU1dKlcllHINAo.png"
-                  alt="Assoc Prof Alabi Olaide Bukola – Dean of Faculty"
+                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-E0xF3lk30cDqt6SiWNNnKDSBhTz49z.png"
+
+                  alt="Prof Akindoju Olugbenga Gabriel– Dean of Faculty"
                   fill
                   className="object-cover rounded-lg"
                 />
@@ -142,7 +143,7 @@ export default function Home() {
               <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-primary">Faculty of Education</h2>
               <div className="bg-card p-6 rounded-lg border border-border">
                 <p className="text-foreground/90 mb-4 leading-relaxed font-semibold text-lg">
-                  ASSOC PROF ALABI OLAIDE BUKOLA
+                  PROF AKINDOJU OLUGBENGA GABRIEL
                 </p>
                 <p className="text-foreground/70 mb-4 font-semibold">Dean of Faculty</p>
                 <p className="text-foreground/90 mb-4 leading-relaxed">
@@ -161,8 +162,8 @@ export default function Home() {
             <div className="flex justify-center">
               <div className="relative w-48 h-64">
                 <Image
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-E0xF3lk30cDqt6SiWNNnKDSBhTz49z.png"
-                  alt="Prof Akindoju Olugbenga Gabriel – Head of Department"
+                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-Y5m5ft6lOPdMmx0pDU1dKlcllHINAo.png"
+                  alt="Assoc Prof Alabi Olaide Bukola  – Head of Department"
                   fill
                   className="object-cover rounded-lg"
                 />
@@ -174,7 +175,8 @@ export default function Home() {
               </h2>
               <div className="bg-background p-6 rounded-lg border border-border">
                 <p className="text-foreground/90 mb-4 leading-relaxed font-semibold text-lg">
-                  PROF AKINDOJU OLUGBENGA GABRIEL
+
+                  ASSOC PROF ALABI OLAIDE BUKOLA
                 </p>
                 <p className="text-foreground/70 mb-4 font-semibold">Head of Department</p>
                 <p className="text-foreground/90 mb-4 leading-relaxed">
