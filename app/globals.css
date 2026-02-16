@@ -281,19 +281,19 @@
 }
 
 .card-hover {
-  @apply card-base hover:shadow-xl hover:-translate-y-1;
+  @apply bg-card rounded-2xl border border-border shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
 }
 
 .resource-card {
-  @apply card-hover p-6;
+  @apply bg-card rounded-2xl border border-border shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 p-6;
 }
 
 .course-card {
-  @apply card-hover p-6;
+  @apply bg-card rounded-2xl border border-border shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 p-6;
 }
 
 .news-card {
-  @apply card-hover p-6;
+  @apply bg-card rounded-2xl border border-border shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 p-6;
 }
 
 /* ============ HERO SECTION ============ */
