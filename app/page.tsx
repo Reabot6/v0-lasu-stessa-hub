@@ -51,17 +51,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-              Explore Courses
-            </Link>
-            <Link
-              href="/resources"
-              className="inline-flex items-center justify-center px-8 py-4 border-2 border-primary-foreground/60 text-primary-foreground font-bold text-lg rounded-lg hover:bg-primary-foreground/10 transition-all duration-300"
-            >
-              Browse Resources
-            </Link>
-          </div>
-        </div>
-      </section>
 
       {/* Vice Chancellor's Welcome – styled like the reference */}
       <ScrollObserver>
