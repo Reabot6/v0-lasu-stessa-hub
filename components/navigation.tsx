@@ -11,6 +11,7 @@ export function Navigation() {
   const router = useRouter();
   const [isAdmin, setIsAdmin] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
 
   useEffect(() => {
     setIsAdmin(isAdminLoggedIn());
@@ -26,152 +27,173 @@ export function Navigation() {
     return pathname === path;
   };
 
+  const navItems = [
+    { href: '/', label: 'Home' },
+    { href: '/academics', label: 'Academics' },
+    { href: '/resources', label: 'Resources' },
+    { href: '/news', label: 'News' },
+  ];
+
   return (
     <>
-      {/* Repeating "We are LASU We are Great" Header */}
-      <div className="bg-primary text-primary-foreground overflow-hidden py-2 sm:py-3">
-        <div className="animate-scroll whitespace-nowrap flex">
+      {/* Futuristic Motto Banner */}
+      <div className="bg-gradient-to-r from-primary via-[#1a1f3a] to-primary text-[#00f5ff] overflow-hidden py-2 relative">
+        <div className="absolute inset-0 animate-scanlines opacity-20 pointer-events-none" />
+        <div className="animate-scroll whitespace-nowrap flex relative z-10">
           {Array.from({ length: 8 }).map((_, i) => (
-            <span key={i} className="inline-block text-lg sm:text-xl md:text-2xl font-bold px-8">
+            <span key={i} className="inline-block text-sm sm:text-base md:text-lg font-bold px-8 neon-text-cyan">
               We are LASU We are Great
             </span>
           ))}
         </div>
       </div>
 
-      <nav className="bg-primary text-primary-foreground shadow-lg">
+      {/* Glassmorphic Navbar */}
+      <nav className="fixed top-[2.5rem] sm:top-12 left-0 right-0 z-50 glass-cyber rounded-b-xl shadow-2xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <Link href="/" className="font-bold text-lg sm:text-xl hover:opacity-90 transition">
-              STE Hub
+          <div className="flex justify-between items-center h-16 sm:h-20">
+            {/* Left: Animated LASU Logo/Crest */}
+            <Link 
+              href="/" 
+              className="flex items-center gap-2 group"
+              title="LASU - Lagos State University"
+            >
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-[#00f5ff] flex items-center justify-center group-hover:animate-holographic-3d bg-gradient-to-br from-[#00f5ff]/20 to-[#9d00ff]/20">
+                <span className="text-[#00f5ff] font-bold text-sm sm:text-base animate-neon-glow">L</span>
+              </div>
+              <div className="hidden sm:flex flex-col">
+                <span className="text-[#00f5ff] font-bold text-sm neon-text-cyan">LASU</span>
+                <span className="text-[#9d00ff] text-xs font-semibold">STESA</span>
+              </div>
             </Link>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-1">
-              <Link
-                href="/"
-                className={`nav-link ${isActive('/') ? 'bg-secondary' : ''}`}
-              >
-                Home
-              </Link>
-              <Link
-                href="/academics"
-                className={`nav-link ${isActive('/academics') ? 'bg-secondary' : ''}`}
-              >
-                Academics
-              </Link>
-              <Link
-                href="/resources"
-                className={`nav-link ${isActive('/resources') ? 'bg-secondary' : ''}`}
-              >
-                Resources
-              </Link>
-              <Link
-                href="/news"
-                className={`nav-link ${isActive('/news') ? 'bg-secondary' : ''}`}
-              >
-                News
-              </Link>
+            {/* Center: Navigation Menu (Desktop) */}
+            <div className="hidden lg:flex items-center gap-6">
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`relative text-sm font-semibold uppercase tracking-wider transition-all duration-300 ${
+                    isActive(item.href)
+                      ? 'text-[#00f5ff]'
+                      : 'text-[#a0a6b8] hover:text-[#00f5ff]'
+                  }`}
+                >
+                  {item.label}
+                  {isActive(item.href) && (
+                    <span className="absolute -bottom-2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#00f5ff] to-transparent" />
+                  )}
+                </Link>
+              ))}
             </div>
 
-            {/* Desktop Admin Section */}
-            <div className="hidden md:flex items-center gap-3">
+            {/* Right: AI Search Orb & Auth */}
+            <div className="flex items-center gap-3 sm:gap-4">
+              {/* AI Search Orb */}
+              <button
+                onClick={() => setShowSearch(!showSearch)}
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#00f5ff]/30 to-[#9d00ff]/30 border border-[#00f5ff] flex items-center justify-center hover:border-[#9d00ff] transition-all duration-300 hover:shadow-lg hover:neon-glow-cyan"
+                title="AI Search"
+              >
+                <span className="text-[#00f5ff] text-lg">◉</span>
+              </button>
+
+              {/* Admin/Auth Button */}
               {isAdmin ? (
-                <>
-                  <Link href="/admin" className="nav-link text-sm">
-                    Admin Panel
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/admin"
+                    className="hidden sm:block cyber-button text-xs"
+                  >
+                    Panel
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="btn-secondary text-sm"
+                    className="cyber-button text-xs"
                   >
                     Logout
                   </button>
-                </>
+                </div>
               ) : (
-                <Link href="/admin/login" className="btn-secondary text-sm">
-                  Admin
+                <Link href="/admin/login" className="cyber-button purple text-xs">
+                  Login
                 </Link>
               )}
-            </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden text-primary-foreground text-2xl focus:outline-none"
-            >
-              ☰
-            </button>
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="lg:hidden w-8 h-8 flex flex-col justify-center gap-1 hover:opacity-80 transition"
+              >
+                <span className={`w-6 h-0.5 bg-[#00f5ff] transition-all duration-300 ${mobileMenuOpen ? 'rotate-45 translate-y-1.5' : ''}`} />
+                <span className={`w-6 h-0.5 bg-[#00f5ff] transition-all duration-300 ${mobileMenuOpen ? 'opacity-0' : ''}`} />
+                <span className={`w-6 h-0.5 bg-[#00f5ff] transition-all duration-300 ${mobileMenuOpen ? '-rotate-45 -translate-y-1.5' : ''}`} />
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* Search Panel (Full Screen) */}
+        {showSearch && (
+          <div className="absolute top-full left-0 right-0 bg-gradient-to-b from-[rgba(10,15,28,0.95)] to-[rgba(10,15,28,0.8)] border-t border-[#00f5ff]/30 p-8">
+            <div className="max-w-2xl mx-auto">
+              <input
+                type="text"
+                placeholder="Search courses, resources, news..."
+                className="w-full px-4 py-3 bg-rgba(0,245,255,0.05) border border-[#00f5ff]/50 rounded-lg text-[#e0e6ff] placeholder-[#a0a6b8]/50 focus:border-[#00f5ff] focus:outline-none focus:neon-glow-cyan transition-all"
+                autoFocus
+              />
+            </div>
+          </div>
+        )}
       </nav>
 
-      {/* Mobile Navigation Menu - Slide from right */}
+      {/* Spacer for fixed nav */}
+      <div className="h-[7.5rem] sm:h-[8.5rem]" />
+
+      {/* Mobile Navigation Menu */}
       <div
-        className={`fixed top-0 right-0 h-full w-64 bg-primary text-primary-foreground shadow-2xl transform transition-transform duration-300 ease-out z-40 md:hidden ${
+        className={`fixed top-0 right-0 h-full w-72 glass-neon transform transition-transform duration-300 ease-out z-40 lg:hidden pt-20 ${
           mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="p-6 space-y-4">
+        <div className="p-6 space-y-6">
           {/* Close Button */}
           <button
             onClick={() => setMobileMenuOpen(false)}
-            className="absolute top-4 right-4 text-2xl font-bold text-primary-foreground hover:opacity-70"
+            className="absolute top-6 right-6 text-2xl neon-text-cyan hover:opacity-70"
           >
-            ×
+            ✕
           </button>
 
-          {/* Menu Items */}
-          <div className="pt-8 space-y-3">
-            <Link
-              href="/"
-              className={`block px-4 py-3 rounded-lg transition ${
-                isActive('/') ? 'bg-secondary' : 'hover:bg-primary-foreground/10'
-              }`}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Home
-            </Link>
-            <Link
-              href="/academics"
-              className={`block px-4 py-3 rounded-lg transition ${
-                isActive('/academics') ? 'bg-secondary' : 'hover:bg-primary-foreground/10'
-              }`}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Academics
-            </Link>
-            <Link
-              href="/resources"
-              className={`block px-4 py-3 rounded-lg transition ${
-                isActive('/resources') ? 'bg-secondary' : 'hover:bg-primary-foreground/10'
-              }`}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Resources
-            </Link>
-            <Link
-              href="/news"
-              className={`block px-4 py-3 rounded-lg transition ${
-                isActive('/news') ? 'bg-secondary' : 'hover:bg-primary-foreground/10'
-              }`}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              News
-            </Link>
+          {/* Mobile Menu Items */}
+          <div className="pt-4 space-y-2">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`block px-4 py-3 rounded-lg transition-all duration-300 uppercase text-sm font-bold tracking-wider ${
+                  isActive(item.href)
+                    ? 'bg-[#9d00ff]/30 border border-[#9d00ff] text-[#9d00ff]'
+                    : 'text-[#a0a6b8] hover:text-[#00f5ff] hover:bg-[#00f5ff]/10'
+                }`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {item.label}
+              </Link>
+            ))}
           </div>
 
           {/* Divider */}
-          <div className="border-t border-primary-foreground/20" />
+          <div className="border-t border-[#00f5ff]/20" />
 
           {/* Admin Section */}
-          <div className="space-y-3 pt-3">
+          <div className="space-y-3">
             {isAdmin ? (
               <>
                 <Link
                   href="/admin"
-                  className="block px-4 py-3 rounded-lg bg-secondary/50 hover:bg-secondary transition"
+                  className="block px-4 py-3 rounded-lg bg-[#9d00ff]/30 border border-[#9d00ff] text-[#9d00ff] font-bold text-center text-sm"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Admin Panel
@@ -181,7 +203,7 @@ export function Navigation() {
                     handleLogout();
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full px-4 py-3 rounded-lg bg-red-600 hover:bg-red-700 transition font-semibold"
+                  className="w-full px-4 py-3 rounded-lg bg-[#ff0055]/30 border border-[#ff0055] text-[#ff0055] font-bold text-sm"
                 >
                   Logout
                 </button>
@@ -189,7 +211,7 @@ export function Navigation() {
             ) : (
               <Link
                 href="/admin/login"
-                className="block px-4 py-3 rounded-lg bg-secondary hover:bg-secondary-foreground/10 transition text-center font-semibold"
+                className="block px-4 py-3 rounded-lg cyber-button purple text-center"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Admin Login
@@ -202,7 +224,7 @@ export function Navigation() {
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
