@@ -297,11 +297,14 @@
 
 /* ============ HERO SECTION ============ */
 .hero-gradient {
-  @apply bg-gradient-to-br from-primary via-secondary to-primary;
+  background: linear-gradient(to bottom right, var(--primary), var(--secondary), var(--primary));
 }
 
 .gradient-text {
-  @apply bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent;
+  background: linear-gradient(to right, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* ============ LOADING STATES ============ */
