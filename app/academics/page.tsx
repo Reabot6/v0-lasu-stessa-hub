@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Navigation } from '@/components/navigation';
+import { ModuleLoading } from '@/components/module-loading';
 import { getCourses, Course, isAdminLoggedIn } from '@/lib/storage';
 import Link from 'next/link';
 
@@ -64,8 +65,8 @@ export default function AcademicsPage() {
 
           {/* Course Grid */}
           {loading ? (
-            <div className="text-center py-12">
-              <p className="text-lg text-foreground/60">Loading courses...</p>
+            <div className="flex items-center justify-center py-20 min-h-[60vh]">
+              <ModuleLoading moduleType="academics" />
             </div>
           ) : filteredCourses.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
