@@ -268,7 +268,7 @@ export default function Home() {
             >
               reabot6
             </a>{' '}
-            (onimisiadeolu@gmail.com)
+
           </p>
         </div>
       </footer>
