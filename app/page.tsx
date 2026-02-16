@@ -306,5 +306,7 @@ export default function Home() {
             (onimisiadeolu@gmail.com)
           </p>
         </div>
-      </footer>  );
+      </footer>
+    </div>
+  );
 }
