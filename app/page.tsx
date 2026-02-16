@@ -272,21 +272,39 @@ export default function Home() {
         </div>
       </section>
       {/* LASU Motto Footer Banner */}
-      <div className="bg-accent text-primary font-bold text-center py-3 px-4">
-        <p className="text-sm sm:text-base">WE ARE LASU • WE ARE GREAT</p>
+      <div className="bg-accent text-primary font-semibold text-center py-4 shadow-inner">
+        <p className="text-base md:text-lg tracking-wide">
+          WE ARE LASU • WE ARE GREAT
+        </p>
       </div>
 
       {/* Footer */}
-      <footer className="bg-primary text-primary-foreground py-8">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <p className="opacity-80 mb-2">
-            &copy; 2024 LASU STESA - Science, Technology, Engineering and Skills Services for Africa
+      <footer className="bg-primary text-primary-foreground py-10 md:py-12">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 text-center space-y-4">
+          <p className="text-base md:text-lg opacity-90">
+            © {new Date().getFullYear()} LASU STESA
+            <span className="mx-2">•</span>
+            Science, Technology, Engineering and Skills Services for Africa
           </p>
-          <p className="text-sm opacity-70">
-            Department of Science and Technology Education, Faculty of Education
+
+          <p className="text-sm md:text-base opacity-75">
+            Department of Science and Technology Education
+            <span className="hidden sm:inline mx-2">|</span>
+            Faculty of Education, Lagos State University
+          </p>
+
+          {/* Credit line – made with love */}
+          <p className="text-sm md:text-base opacity-70 pt-4 border-t border-primary-foreground/20 mt-6">
+            Made with ❤️ for LASUites by{' '}
+            <a
+              href="mailto:onimisiadeolu@gmail.com"
+              className="text-accent hover:text-accent/80 font-medium transition-colors underline underline-offset-2"
+            >
+              Reabot6
+            </a>
+            {' '}
+            (onimisiadeolu@gmail.com)
           </p>
         </div>
-      </footer>
-    </div>
-  );
+      </footer>  );
 }
