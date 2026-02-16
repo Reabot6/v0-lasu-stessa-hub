@@ -93,15 +93,7 @@ export default function AdminLoginPage() {
               </button>
             </form>
 
-            <div className="mt-6 p-4 bg-muted rounded-lg">
-              <p className="text-xs text-foreground/60">
-                <strong>Demo Credentials:</strong>
-                <br />
-                Email: stessaedu@gmail.com
-                <br />
-                Password: admin123stessa
-              </p>
-            </div>
+
           </div>
         </div>
       </section>
