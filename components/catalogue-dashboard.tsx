@@ -149,12 +149,12 @@ export function CatalogueDashboard() {
                   item.color === 'cyan' ? 'border-[#00f5ff]' :
                   item.color === 'purple' ? 'border-[#9d00ff]' :
                   'border-[#ffd700]'
-                } opacity-60 group-hover:opacity-100 transition-opacity` />
+                } opacity-60 group-hover:opacity-100 transition-opacity`} />
                 <div className={`absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 ${
                   item.color === 'cyan' ? 'border-[#00f5ff]' :
                   item.color === 'purple' ? 'border-[#9d00ff]' :
                   'border-[#ffd700]'
-                } opacity-60 group-hover:opacity-100 transition-opacity` />
+                } opacity-60 group-hover:opacity-100 transition-opacity`} />
 
                 {/* Content */}
                 <div className="relative z-10 flex flex-col h-full">
