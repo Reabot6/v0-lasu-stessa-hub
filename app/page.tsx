@@ -56,7 +56,14 @@ export default function Home() {
               </Link>
               <Link
                 href="/resources"
-                className="inline-flex items-center justify-center px-8 py-4 glass-card text-primary-foreground font-bold text-lg rounded-full hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+                className="inline-flex items-center justify-center px-8 py-4 text-primary-foreground font-bold text-lg rounded-full hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.15)',
+                  backdropFilter: 'blur(12px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(12px) saturate(180%)',
+                  border: '1px solid rgba(255, 255, 255, 0.25)',
+                  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.1)',
+                }}
               >
                 Browse Resources
               </Link>
