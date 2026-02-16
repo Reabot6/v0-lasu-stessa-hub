@@ -61,34 +61,60 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Vice Chancellor Welcome */}
-      <section className="py-12 sm:py-16 bg-card border-b border-border">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-8 items-start">
-            <div className="md:col-span-2">
-              <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-primary">Vice Chancellor's Welcome</h2>
-              <div className="bg-background p-6 rounded-lg border border-border">
-                <p className="text-foreground/90 mb-4 leading-relaxed italic">
-                  "It is with great pleasure that I welcome you to Lagos State University, the citadel of learning, the University of First Choice and the Nation's pride. Over the years, the institution has demonstrated excellence in its activities. We are irrevocably committed to sustaining this culture and indeed transmitting it from excellence to distinction. I once again welcome you to the 'Preferred State University at the Centre of Excellence'."
+      {/* Vice Chancellor's Welcome – styled like the reference */}
+      <section className="py-16 md:py-20 bg-gradient-to-br from-card via-card to-background/80 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+
+            {/* Left: Text content */}
+            <div className="space-y-8 md:space-y-10 order-2 lg:order-1">
+              <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-primary leading-tight tracking-tight">
+                Welcome & Greetings!
+              </h2>
+
+              <div className="relative pl-12 md:pl-16">
+                {/* Large decorative quote mark */}
+                <span className="absolute left-0 top-[-0.2em] text-8xl sm:text-9xl md:text-[10rem] font-black text-accent/40 leading-none select-none">
+                  “
+                </span>
+
+                <blockquote className="text-lg sm:text-xl md:text-2xl leading-relaxed text-foreground/90 italic font-medium">
+                  It is with great pleasure that I welcome you to Lagos State University, the citadel of learning, the University of First Choice and the Nation’s pride. Over the years, the institution has demonstrated excellence in its activities. We are irrevocably committed to sustaining this culture and indeed transmitting it from excellence to distinction. I once again welcome you to the "Preferred State University at the Centre of Excellence".
+                </blockquote>
+              </div>
+
+              <div className="pt-6 space-y-2">
+                <p className="text-2xl sm:text-3xl font-bold text-primary">
+                  Prof. Ibiyemi Olaitanji-Bello, mni, fnli, FSPSP, NPOM
                 </p>
-                <p className="font-bold text-primary">Prof. Ibiyemi Olatunji-Bello, mni, fnli, FSPSP, NPOM</p>
-                <p className="text-foreground/70 text-sm">Vice Chancellor, Lagos State University</p>
+                <p className="text-xl text-foreground/80 font-medium">
+                  Vice Chancellor, Lagos State University
+                </p>
               </div>
             </div>
-            <div className="flex justify-center md:block">
-              <div className="relative w-48 h-64">
+
+            {/* Right: Large portrait with red/gown vibe */}
+            <div className="relative order-1 lg:order-2">
+              <div className="relative aspect-[3/4] max-w-md mx-auto lg:mx-0 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-border/40">
                 <Image
                   src="https://lasu.edu.ng/home/img/our_vc.png"
-                  alt="Vice Chancellor"
+                  alt="Prof. Ibiyemi Olaitanji-Bello – Vice Chancellor"
                   fill
-                  className="object-cover rounded-lg"
+                  className="object-cover object-top"
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 50vw"
                 />
+
+                {/* Optional subtle overlay gradient to give warm/red tint like the reference */}
+                <div className="absolute inset-0 bg-gradient-to-t from-red-950/20 via-transparent to-transparent pointer-events-none" />
               </div>
+
+              {/* Optional: small decorative element like tassel or emblem feel */}
+              <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-accent/10 rounded-full blur-2xl -z-10" />
             </div>
           </div>
         </div>
       </section>
-
       {/* Faculty of Education */}
       <section className="py-12 sm:py-16 bg-background">
         <div className="max-w-6xl mx-auto px-4">
