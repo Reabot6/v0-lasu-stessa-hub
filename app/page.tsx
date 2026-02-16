@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
 import { Navigation } from '@/components/navigation';
-import { ScrollObserver } from '@/components/scroll-observer';
-import { HeroCarousel } from '@/components/hero-carousel';
-import { AnimateOnScroll, ParallaxImage, CountUp } from '@/components/advanced-scroll-animation';
-import { BentoGrid, BentoGridItem, FeatureCard } from '@/components/bento-grid';
+import { CyberHero } from '@/components/cyber-hero';
+import { LeadershipSection } from '@/components/leadership-section';
+import { HexagonalDepartments } from '@/components/hexagonal-departments';
+import { StatsSection } from '@/components/stats-section';
+import { NewsCarousel } from '@/components/news-carousel';
+import { CatalogueDashboard } from '@/components/catalogue-dashboard';
+import { CyberFooter } from '@/components/cyber-footer';
 import { initializeStorage } from '@/lib/storage';
 
 export default function Home() {
@@ -16,122 +17,32 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#0a0f1c]">
       <Navigation />
 
-      {/* Hero Section with Carousel Background */}
-      <section className="relative overflow-hidden min-h-[70vh] sm:min-h-[80vh] md:min-h-[90vh] flex items-center justify-center">
-        {/* Carousel Background */}
-        <div className="absolute inset-0 z-0">
-          <HeroCarousel isBackground={true} />
-        </div>
+      {/* Hero Section */}
+      <CyberHero />
 
-        {/* Foreground Content */}
-        <div className="relative z-10 max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 py-20 md:py-28 text-center">
-          <AnimateOnScroll animationType="fadeUp" duration={0.8}>
-            <h1 className="text-hero mb-6 drop-shadow-lg text-white animate-float-in">
-              Welcome to STESA
-            </h1>
-          </AnimateOnScroll>
-          
-          <AnimateOnScroll animationType="fadeUp" duration={0.8} delay={0.2}>
-            <p className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 drop-shadow-md text-accent">
-              Science and Technology Education
-            </p>
-          </AnimateOnScroll>
-          
-          <AnimateOnScroll animationType="fadeUp" duration={0.8} delay={0.4}>
-            <p className="text-lg sm:text-xl opacity-95 mb-10 max-w-3xl mx-auto leading-relaxed text-white drop-shadow-md">
-              Your comprehensive hub for accessing courses, learning resources, and staying updated with departmental announcements.
-            </p>
-          </AnimateOnScroll>
-          
-          <AnimateOnScroll animationType="scale" duration={0.8} delay={0.6}>
-            <div className="flex flex-col sm:flex-row gap-5 justify-center">
-              <Link
-                href="/academics"
-                className="btn-cta inline-flex items-center justify-center px-8 py-4 font-bold text-lg"
-              >
-                Explore Courses
-              </Link>
-              <Link
-                href="/resources"
-                className="inline-flex items-center justify-center px-8 py-4 text-primary-foreground font-bold text-lg rounded-full hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.15)',
-                  backdropFilter: 'blur(12px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(12px) saturate(180%)',
-                  border: '1px solid rgba(255, 255, 255, 0.25)',
-                  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.1)',
-                }}
-              >
-                Browse Resources
-              </Link>
-            </div>
-          </AnimateOnScroll>
-        </div>
-      </section>
+      {/* Leadership Vision */}
+      <LeadershipSection />
 
-      {/* Vice Chancellor's Welcome – styled like the reference */}
-      <ScrollObserver>
-        <section className="py-16 md:py-20 bg-gradient-to-br from-card via-card to-background/80 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Left: Text content */}
-            <div className="space-y-8 md:space-y-10 order-2 lg:order-1">
-              <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-primary leading-tight tracking-tight">
-                Welcome & Greetings!
-              </h2>
+      {/* Academic Departments */}
+      <HexagonalDepartments />
 
-              <div className="relative pl-12 md:pl-16">
-                {/* Large decorative quote mark */}
-                <span className="absolute left-0 top-[-0.2em] text-8xl sm:text-9xl md:text-[10rem] font-black text-accent/40 leading-none select-none">
-                  “
-                </span>
+      {/* Statistics Section */}
+      <StatsSection />
 
-                <blockquote className="text-lg sm:text-xl md:text-2xl leading-relaxed text-foreground/90 italic font-medium">
-                  It is with great pleasure that I welcome you to Lagos State University, the citadel of learning, the University of First Choice and the Nation’s pride. Over the years, the institution has demonstrated excellence in its activities. We are irrevocably committed to sustaining this culture and indeed transmitting it from excellence to distinction. I once again welcome you to the "Preferred State University at the Centre of Excellence".
-                </blockquote>
-              </div>
+      {/* Service Catalogue */}
+      <CatalogueDashboard />
 
-              <div className="pt-6 space-y-2">
-                <p className="text-2xl sm:text-3xl font-bold text-primary">
-                  Prof. Ibiyemi Olaitanji-Bello, mni, fnli, FSPSP, NPOM
-                </p>
-                <p className="text-xl text-foreground/80 font-medium">
-                  Vice Chancellor, Lagos State University
-                </p>
-              </div>
-            </div>
+      {/* News Carousel */}
+      <NewsCarousel />
 
-            {/* Right: Large portrait with red/gown vibe */}
-            <div className="relative order-1 lg:order-2">
-              <div className="relative aspect-[3/4] max-w-md mx-auto lg:mx-0 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-border/40">
-                <Image
-                  src="https://lasu.edu.ng/home/img/our_vc.png"
-                  alt="Prof. Ibiyemi Olaitanji-Bello – Vice Chancellor"
-                  fill
-                  className="object-cover object-top"
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                />
-
-                {/* Optional subtle overlay gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-red-950/20 via-transparent to-transparent pointer-events-none" />
-              </div>
-
-              {/* Optional decorative blur element */}
-              <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-accent/10 rounded-full blur-2xl -z-10" />
-            </div>
-          </div>
-        </div>
-      </section>
-      </ScrollObserver>
-
-      {/* Faculty of Education */}
-      <ScrollObserver>
-        <section className="py-12 sm:py-16 bg-background">
-        <div className="max-w-6xl mx-auto px-4">
+      {/* Footer */}
+      <CyberFooter />
+    </div>
+  );
+}
           <div className="grid md:grid-cols-3 gap-8 items-start">
             <div className="flex justify-center md:order-2">
               <div className="relative w-48 h-64">
