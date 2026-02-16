@@ -45,7 +45,7 @@ export default function Home() {
         {/* Foreground content */}
         <div className="relative z-10 max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 py-20 md:py-28 text-center">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 tracking-tight drop-shadow-md">
-            Welcome to STESSA
+            Welcome to STESA
           </h1>
           <p className="text-xl sm:text-2xl md:text-3xl opacity-95 mb-6 font-medium">
             Science and Technology Education
