@@ -107,7 +107,7 @@ export default function Home() {
               <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-primary">Faculty of Education</h2>
               <div className="bg-card p-6 rounded-lg border border-border">
                 <p className="text-foreground/90 mb-4 leading-relaxed font-semibold text-lg">
-                  PROF AKINDOJU OLUGBENGA GABRIEL
+                  ASSOC PROF ALABI OLAIDE BUKOLA
                 </p>
                 <p className="text-foreground/70 mb-4 font-semibold">Dean of Faculty</p>
                 <p className="text-foreground/90 mb-4 leading-relaxed">
@@ -137,7 +137,8 @@ export default function Home() {
               <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-primary">Department of Science & Technology Education</h2>
               <div className="bg-background p-6 rounded-lg border border-border">
                 <p className="text-foreground/90 mb-4 leading-relaxed font-semibold text-lg">
-                  ASSOC PROF ALABI OLAIDE BUKOLA
+
+                  PROF AKINDOJU OLUGBENGA GABRIEL
                 </p>
                 <p className="text-foreground/70 mb-4 font-semibold">Head of Department</p>
                 <p className="text-foreground/90 mb-4 leading-relaxed">
