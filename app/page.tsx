@@ -268,7 +268,6 @@ export default function Home() {
             >
               reabot6
             </a>
-
           </p>
         </div>
       </footer>
