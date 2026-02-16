@@ -28,10 +28,10 @@ export default function AdminPage() {
 
   // Course form
   const [courseForm, setCourseForm] = useState<Partial<Course>>({});
-  
+
   // Resource form
   const [resourceForm, setResourceForm] = useState<Partial<Resource>>({});
-  
+
   // News form
   const [newsForm, setNewsForm] = useState<Partial<NewsItem>>({});
 
@@ -289,31 +289,28 @@ export default function AdminPage() {
           <div className="flex gap-4 mb-8 border-b border-border">
             <button
               onClick={() => setActiveTab('courses')}
-              className={`px-4 py-3 font-semibold border-b-2 transition ${
-                activeTab === 'courses'
+              className={`px-4 py-3 font-semibold border-b-2 transition ${activeTab === 'courses'
                   ? 'border-primary text-primary'
                   : 'border-transparent text-foreground/60 hover:text-foreground'
-              }`}
+                }`}
             >
               Courses ({courses.length})
             </button>
             <button
               onClick={() => setActiveTab('resources')}
-              className={`px-4 py-3 font-semibold border-b-2 transition ${
-                activeTab === 'resources'
+              className={`px-4 py-3 font-semibold border-b-2 transition ${activeTab === 'resources'
                   ? 'border-primary text-primary'
                   : 'border-transparent text-foreground/60 hover:text-foreground'
-              }`}
+                }`}
             >
               Resources ({resources.length})
             </button>
             <button
               onClick={() => setActiveTab('news')}
-              className={`px-4 py-3 font-semibold border-b-2 transition ${
-                activeTab === 'news'
+              className={`px-4 py-3 font-semibold border-b-2 transition ${activeTab === 'news'
                   ? 'border-primary text-primary'
                   : 'border-transparent text-foreground/60 hover:text-foreground'
-              }`}
+                }`}
             >
               News ({news.length})
             </button>
@@ -463,7 +460,7 @@ export default function AdminPage() {
                     className="px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
-                
+
                 {/* File Upload Section */}
                 {resourceForm.course_id && (
                   <div className="mb-4 p-4 bg-muted rounded-lg">
@@ -494,7 +491,7 @@ export default function AdminPage() {
                     )}
                   </div>
                 )}
-                
+
                 <textarea
                   placeholder="Description"
                   value={resourceForm.description || ''}
@@ -659,7 +656,7 @@ export default function AdminPage() {
       <footer className="bg-primary text-primary-foreground py-8">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <p className="opacity-80">
-            &copy; 2024 LASU STESSA. All rights reserved.
+            &copy; 2024 LASU STE. All rights reserved.
           </p>
         </div>
       </footer>
