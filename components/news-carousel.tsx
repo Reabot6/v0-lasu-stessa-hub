@@ -9,8 +9,11 @@ export function NewsCarousel() {
   const [tiltStyle, setTiltStyle] = useState({ rotateX: 0, rotateY: 0 });
 
   useEffect(() => {
-    const newsData = getNews();
-    setNews(newsData.slice(0, 5)); // Show first 5 news items
+    const loadNews = async () => {
+      const newsData = await getNews();
+      setNews(Array.isArray(newsData) ? newsData.slice(0, 5) : []);
+    };
+    loadNews();
   }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
