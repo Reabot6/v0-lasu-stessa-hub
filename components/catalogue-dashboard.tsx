@@ -142,7 +142,7 @@ export function CatalogueDashboard() {
                   item.color === 'cyan' ? 'from-[#00f5ff] to-[#9d00ff]' :
                   item.color === 'purple' ? 'from-[#9d00ff] to-[#ffd700]' :
                   'from-[#ffd700] to-[#00f5ff]'
-                } opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none` />
+                } opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
 
                 {/* Corner Accents */}
                 <div className={`absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 ${
