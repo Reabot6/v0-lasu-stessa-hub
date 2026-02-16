@@ -75,7 +75,7 @@ export function HeroCarousel({ isBackground = false }: HeroCarouselProps) {
         {slides.map((slide, index) => (
           <div
             key={slide.id}
-            className={`absolute inset-0 transition-all duration-700 ease-in-out ${
+            className={`absolute inset-0 transition-all duration-700 ease-in-out flex items-center justify-center ${
               index === currentSlide
                 ? 'opacity-100 scale-100'
                 : 'opacity-0 scale-105'
@@ -85,7 +85,7 @@ export function HeroCarousel({ isBackground = false }: HeroCarouselProps) {
               src={slide.image}
               alt={slide.alt}
               fill
-              className="object-cover"
+              className="object-cover object-center"
               priority={index === 0}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 100vw"
             />
@@ -132,10 +132,7 @@ export function HeroCarousel({ isBackground = false }: HeroCarouselProps) {
         ))}
       </div>
 
-      {/* Slide Counter */}
-      <div className="absolute top-4 right-4 z-20 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-semibold">
-        {currentSlide + 1} / {slides.length}
-      </div>
+      {/* Slide Counter - REMOVED */}
     </div>
   );
 }
