@@ -184,53 +184,93 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Services Overview */}
-      <section className="py-12 sm:py-16 bg-background">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">
-            catalouge
-          </h2>
+      {/* Our Catalogue – demure & detailed services overview */}
+      <section className="py-16 md:py-20 bg-background">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+          <div className="text-center mb-14 md:mb-16 space-y-4">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-primary tracking-tight">
+              Our Catalogue
+            </h2>
+            <p className="text-lg md:text-xl text-foreground/70 max-w-3xl mx-auto">
+              Discover the core offerings of STESA — from structured academic programs to rich learning materials and timely departmental updates.
+            </p>
+          </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-8 lg:gap-10">
             {/* Academics Card */}
-            <div className="resource-card hover:shadow-lg transition">
-              <div className="text-accent text-4xl mb-4">📚</div>
-              <h3 className="text-xl font-bold mb-3 text-primary">Academics</h3>
-              <p className="text-foreground/80 mb-6">
-                Browse our comprehensive course catalog organized by department with detailed descriptions and course codes.
-              </p>
-              <Link href="/academics" className="text-primary font-semibold hover:text-accent transition">
-                View Courses →
-              </Link>
+            <div className="group bg-card rounded-2xl border border-border/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+              <div className="p-8 md:p-10 space-y-6">
+                <div className="text-accent text-5xl md:text-6xl opacity-90 group-hover:opacity-100 transition-opacity">
+                  📚
+                </div>
+                <div className="space-y-3">
+                  <h3 className="text-2xl font-semibold text-primary">
+                    Academics
+                  </h3>
+                  <p className="text-foreground/75 leading-relaxed">
+                    Explore our full curriculum across departments including Biology Education, Chemistry, Computer Science, Educational Technology, Mathematics, and Physics Education. View detailed course descriptions, codes, learning outcomes, prerequisites, and semester structures.
+                  </p>
+                </div>
+                <Link
+                  href="/academics"
+                  className="inline-flex items-center gap-2 text-primary font-medium hover:text-accent transition-colors"
+                >
+                  View Full Course Catalogue
+                  <span aria-hidden="true">→</span>
+                </Link>
+              </div>
             </div>
 
             {/* Resources Card */}
-            <div className="resource-card hover:shadow-lg transition">
-              <div className="text-accent text-4xl mb-4">📖</div>
-              <h3 className="text-xl font-bold mb-3 text-primary">Resources</h3>
-              <p className="text-foreground/80 mb-6">
-                Access educational materials including videos, PDFs, documents, and links related to your courses.
-              </p>
-              <Link href="/resources" className="text-primary font-semibold hover:text-accent transition">
-                Explore Resources →
-              </Link>
+            <div className="group bg-card rounded-2xl border border-border/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+              <div className="p-8 md:p-10 space-y-6">
+                <div className="text-accent text-5xl md:text-6xl opacity-90 group-hover:opacity-100 transition-opacity">
+                  📖
+                </div>
+                <div className="space-y-3">
+                  <h3 className="text-2xl font-semibold text-primary">
+                    Learning Resources
+                  </h3>
+                  <p className="text-foreground/75 leading-relaxed">
+                    Access a curated collection of high-quality educational materials: lecture notes, instructional videos, research papers, laboratory guides, past examination questions, recommended textbooks, and external reference links — all organized by course and unit for easy navigation.
+                  </p>
+                </div>
+                <Link
+                  href="/resources"
+                  className="inline-flex items-center gap-2 text-primary font-medium hover:text-accent transition-colors"
+                >
+                  Browse All Resources
+                  <span aria-hidden="true">→</span>
+                </Link>
+              </div>
             </div>
 
-            {/* News Card */}
-            <div className="resource-card hover:shadow-lg transition">
-              <div className="text-accent text-4xl mb-4">📰</div>
-              <h3 className="text-xl font-bold mb-3 text-primary">News & Updates</h3>
-              <p className="text-foreground/80 mb-6">
-                Stay informed with the latest announcements, updates, and news from the STESA department.
-              </p>
-              <Link href="/news" className="text-primary font-semibold hover:text-accent transition">
-                Read News →
-              </Link>
+            {/* News & Updates Card */}
+            <div className="group bg-card rounded-2xl border border-border/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+              <div className="p-8 md:p-10 space-y-6">
+                <div className="text-accent text-5xl md:text-6xl opacity-90 group-hover:opacity-100 transition-opacity">
+                  📰
+                </div>
+                <div className="space-y-3">
+                  <h3 className="text-2xl font-semibold text-primary">
+                    News & Department Updates
+                  </h3>
+                  <p className="text-foreground/75 leading-relaxed">
+                    Stay informed with official announcements, event schedules, seminar notices, examination timetables, faculty achievements, student opportunities, important deadlines, and departmental circulars — regularly updated to keep our community connected and prepared.
+                  </p>
+                </div>
+                <Link
+                  href="/news"
+                  className="inline-flex items-center gap-2 text-primary font-medium hover:text-accent transition-colors"
+                >
+                  Read Latest Updates
+                  <span aria-hidden="true">→</span>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </section>
-
       {/* LASU Motto Footer Banner */}
       <div className="bg-accent text-primary font-bold text-center py-3 px-4">
         <p className="text-sm sm:text-base">WE ARE LASU • WE ARE GREAT</p>
