@@ -21,7 +21,7 @@ export default function Home() {
             Welcome to STESSA
           </h1>
           <p className="text-lg sm:text-xl opacity-90 mb-8">
-            Science, Technology, Engineering and Skills Services for Africa
+            Science and  Technology  Education
           </p>
           <p className="text-base sm:text-lg opacity-80 mb-8 max-w-2xl mx-auto">
             Your comprehensive hub for accessing courses, learning resources, and staying updated with departmental announcements.
@@ -95,6 +95,9 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 text-center">
           <p className="opacity-80">
             &copy; 2024 LASU STESSA. All rights reserved.
+ made with ❤️ for Lasuites by{" "}
+      <a href="mailto:onimisiadeolu@gmail.com">
+        reabot6
           </p>
         </div>
       </footer>
