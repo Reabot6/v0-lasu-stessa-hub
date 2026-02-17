@@ -2,13 +2,12 @@
 
 import { useEffect } from 'react';
 import { Navigation } from '@/components/navigation';
-import { CyberHero } from '@/components/cyber-hero';
+import { PremiumHero } from '@/components/premium-hero';
 import { LeadershipSection } from '@/components/leadership-section';
-import { HexagonalDepartments } from '@/components/hexagonal-departments';
-import { StatsSection } from '@/components/stats-section';
-import { NewsCarousel } from '@/components/news-carousel';
-import { CatalogueDashboard } from '@/components/catalogue-dashboard';
-import { CyberFooter } from '@/components/cyber-footer';
+import { DepartmentTree } from '@/components/department-tree';
+import { PremiumStats } from '@/components/premium-stats';
+import { SimpleCatalogue } from '@/components/simple-catalogue';
+import { PremiumFooter } from '@/components/premium-footer';
 import { initializeStorage } from '@/lib/storage';
 
 export default function Home() {
@@ -17,29 +16,26 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0a0f1c]">
+    <div className="min-h-screen bg-background">
       <Navigation />
 
       {/* Hero Section */}
-      <CyberHero />
+      <PremiumHero />
 
       {/* Leadership Vision */}
       <LeadershipSection />
 
-      {/* Academic Departments */}
-      <HexagonalDepartments />
+      {/* Academic Departments Tree */}
+      <DepartmentTree />
 
       {/* Statistics Section */}
-      <StatsSection />
+      <PremiumStats />
 
       {/* Service Catalogue */}
-      <CatalogueDashboard />
-
-      {/* News Carousel */}
-      <NewsCarousel />
+      <SimpleCatalogue />
 
       {/* Footer */}
-      <CyberFooter />
+      <PremiumFooter />
     </div>
   );
 }
