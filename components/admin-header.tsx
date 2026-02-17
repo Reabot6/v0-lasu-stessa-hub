@@ -10,7 +10,6 @@ interface AdminHeaderProps {
 }
 
 export function AdminHeader({ title, description, breadcrumbs }: AdminHeaderProps) {
-  const router = useRouter();
   const pathname = usePathname();
 
   const getBreadcrumbs = () => {

@@ -185,11 +185,11 @@
   .animate-pulse-glow {
     @apply animate-[pulseGlow_2s_ease-in-out_infinite];
   }
+}
 
-  /* Map border-border to border color for compatibility */
-  .border-border {
-    @apply border-slate-700;
-  }
+/* Compatibility utility for border-border class */
+.border-border {
+  border-color: rgb(51, 65, 85);
 }
 
 .dark {
