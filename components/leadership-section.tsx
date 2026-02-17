@@ -116,7 +116,7 @@ export function LeadershipSection() {
                     <span>Educational Technology</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="text-accent font-bold">•</span>
+                    <span className="text-accent font-bold">��</span>
                     <span>Mathematics Education</span>
                   </li>
                   <li className="flex items-start gap-3">
@@ -127,67 +127,6 @@ export function LeadershipSection() {
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-          {leaders.map((leader, idx) => (
-            <div
-              key={idx}
-              className="group relative"
-              onMouseEnter={() => setHoveredIndex(idx)}
-              onMouseLeave={() => setHoveredIndex(null)}
-            >
-              {/* Holographic Card */}
-              <div className={`glass-cyber rounded-xl p-8 transition-all duration-500 overflow-hidden ${
-                hoveredIndex === idx ? 'neon-glow-cyan' : ''
-              }`}>
-                {/* Corner Accents */}
-                <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-[#00f5ff] opacity-60 group-hover:opacity-100 transition-opacity" />
-                <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-[#9d00ff] opacity-60 group-hover:opacity-100 transition-opacity" />
-
-                {/* Animated Avatar Circle */}
-                <div className="relative w-24 h-24 mx-auto mb-6">
-                  <div className={`w-full h-full rounded-full bg-gradient-to-br ${
-                    leader.color === 'cyan' ? 'from-[#00f5ff]/30 to-[#9d00ff]/10' :
-                    leader.color === 'purple' ? 'from-[#9d00ff]/30 to-[#ffd700]/10' :
-                    'from-[#ffd700]/30 to-[#00f5ff]/10'
-                  } border border-${leader.color === 'cyan' ? '[#00f5ff]' : leader.color === 'purple' ? '[#9d00ff]' : '[#ffd700]'} flex items-center justify-center ${
-                    hoveredIndex === idx ? 'animate-holographic-3d' : ''
-                  }`}>
-                    <span className={`text-4xl font-bold ${
-                      leader.color === 'cyan' ? 'neon-text-cyan' :
-                      leader.color === 'purple' ? 'neon-text-purple' :
-                      'neon-text-gold'
-                    }`}>
-                      {leader.name.split(' ')[0][0]}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <h3 className={`text-sm font-bold uppercase tracking-widest mb-2 text-center ${
-                  leader.color === 'cyan' ? 'text-[#00f5ff]' :
-                  leader.color === 'purple' ? 'text-[#9d00ff]' :
-                  'text-[#ffd700]'
-                }`}>
-                  {leader.title}
-                </h3>
-                <h4 className="text-xl font-bold text-[#e0e6ff] text-center mb-3">
-                  {leader.name}
-                </h4>
-                <p className="text-[#a0a6b8] text-center text-sm leading-relaxed">
-                  {leader.description}
-                </p>
-
-                {/* Scanline effect on hover */}
-                {hoveredIndex === idx && (
-                  <div className="absolute inset-0 animate-scanlines pointer-events-none opacity-30" />
-                )}
-              </div>
-            </div>
-          ))}
         </div>
       </div>
     </section>
