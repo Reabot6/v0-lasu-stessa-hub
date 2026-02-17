@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { uploadFile } from '@/lib/storage-utils';
+import { AdminHeader } from '@/components/admin-header';
 
 export default function AdminFacultyPage() {
   const supabase = createClient();
@@ -10,6 +12,7 @@ export default function AdminFacultyPage() {
   const [showForm, setShowForm] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -62,39 +65,37 @@ export default function AdminFacultyPage() {
       // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        alert('You must be logged in to add faculty');
+        alert('You must be logged in');
         setLoading(false);
         return;
       }
 
-      let imageUrl = null;
+      let imageUrl = previewImage;
 
-      // Upload image if provided
-      if (imageFile) {
+      // Upload image if a new file was selected
+      if (imageFile && !previewImage?.includes('supabase')) {
         const fileName = `faculty-${Date.now()}-${imageFile.name}`;
-        const { error: uploadError } = await supabase.storage
-          .from('uploads')
-          .upload(`faculty/${fileName}`, imageFile);
+        const { publicUrl, error: uploadError } = await uploadFile(
+          'uploads',
+          `faculty/${fileName}`,
+          imageFile
+        );
 
         if (uploadError) {
           console.error('Image upload error:', uploadError);
-          alert('Failed to upload image');
+          alert('Failed to upload image: ' + uploadError);
           setLoading(false);
           return;
         }
 
-        // Get public URL
-        const { data } = supabase.storage
-          .from('uploads')
-          .getPublicUrl(`faculty/${fileName}`);
-        imageUrl = data.publicUrl;
+        imageUrl = publicUrl;
       }
 
-      // Insert faculty record into database
-      const { error: insertError } = await supabase
-        .from('faculty')
-        .insert([
-          {
+      // Update or Insert
+      if (editingId) {
+        const { error: updateError } = await supabase
+          .from('faculty')
+          .update({
             name: formData.name,
             email: formData.email,
             phone: formData.phone,
@@ -103,35 +104,46 @@ export default function AdminFacultyPage() {
             office_hours: formData.office_hours,
             bio: formData.bio,
             image_url: imageUrl,
-            created_by: user.id,
-          },
-        ]);
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', editingId);
 
-      if (insertError) {
-        console.error('Insert error:', insertError);
-        alert('Failed to add faculty member: ' + insertError.message);
+        if (updateError) {
+          console.error('Update error:', updateError);
+          alert('Failed to update faculty member: ' + updateError.message);
+        } else {
+          alert('Faculty member updated successfully!');
+          handleCancelEdit();
+          fetchFaculty();
+        }
       } else {
-        alert('Faculty member added successfully!');
-        
-        // Reset form
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          specialization: '',
-          office_location: '',
-          office_hours: '',
-          bio: '',
-        });
-        setImageFile(null);
-        setPreviewImage(null);
-        setShowForm(false);
+        const { error: insertError } = await supabase
+          .from('faculty')
+          .insert([
+            {
+              name: formData.name,
+              email: formData.email,
+              phone: formData.phone,
+              specialization: formData.specialization,
+              office_location: formData.office_location,
+              office_hours: formData.office_hours,
+              bio: formData.bio,
+              image_url: imageUrl,
+              created_by: user.id,
+            },
+          ]);
 
-        // Refresh faculty list
-        fetchFaculty();
+        if (insertError) {
+          console.error('Insert error:', insertError);
+          alert('Failed to add faculty member: ' + insertError.message);
+        } else {
+          alert('Faculty member added successfully!');
+          handleCancelEdit();
+          fetchFaculty();
+        }
       }
     } catch (error) {
-      console.error('Error adding faculty:', error);
+      console.error('Error:', error);
       alert('An unexpected error occurred');
     } finally {
       setLoading(false);
@@ -160,32 +172,82 @@ export default function AdminFacultyPage() {
     fetchFaculty();
   }, []);
 
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this faculty member?')) return;
+    
+    try {
+      const { error } = await supabase
+        .from('faculty')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        alert('Failed to delete faculty member');
+      } else {
+        alert('Faculty member deleted successfully');
+        fetchFaculty();
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      alert('Error deleting faculty member');
+    }
+  };
+
+  const handleEdit = (member: any) => {
+    setEditingId(member.id);
+    setFormData({
+      name: member.name,
+      email: member.email || '',
+      phone: member.phone || '',
+      specialization: member.specialization || '',
+      office_location: member.office_location || '',
+      office_hours: member.office_hours || '',
+      bio: member.bio || '',
+    });
+    if (member.image_url) {
+      setPreviewImage(member.image_url);
+    }
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      specialization: '',
+      office_location: '',
+      office_hours: '',
+      bio: '',
+    });
+    setImageFile(null);
+    setPreviewImage(null);
+    setShowForm(false);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* Header */}
-      <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-white">Faculty Management</h1>
-              <p className="text-slate-400 mt-1">Add, edit, and manage faculty members</p>
-            </div>
-            <button
-              onClick={() => setShowForm(!showForm)}
-              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105 active:scale-95"
-            >
-              + Add Faculty
-            </button>
-          </div>
-        </div>
-      </header>
+      <AdminHeader 
+        title="Faculty Management" 
+        description="Add, edit, and manage faculty members"
+      />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Add Faculty Form */}
+        {/* Add Faculty Button */}
+        {!showForm && (
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="mb-8 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105 active:scale-95"
+          >
+            + Add Faculty
+          </button>
+        )}
         {showForm && (
           <div className="mb-8 bg-slate-800/50 border border-slate-700 rounded-xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-6">Add New Faculty Member</h2>
+            <h2 className="text-2xl font-bold text-white mb-6">{editingId ? 'Edit Faculty Member' : 'Add New Faculty Member'}</h2>
             
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -312,24 +374,11 @@ export default function AdminFacultyPage() {
                   disabled={loading}
                   className="flex-1 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50"
                 >
-                  {loading ? 'Adding...' : 'Add Faculty Member'}
+                  {loading ? 'Saving...' : editingId ? 'Update Faculty Member' : 'Add Faculty Member'}
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowForm(false);
-                    setFormData({
-                      name: '',
-                      email: '',
-                      phone: '',
-                      specialization: '',
-                      office_location: '',
-                      office_hours: '',
-                      bio: '',
-                    });
-                    setImageFile(null);
-                    setPreviewImage(null);
-                  }}
+                  onClick={handleCancelEdit}
                   className="px-6 py-3 bg-slate-700 text-white rounded-lg font-semibold hover:bg-slate-600 transition"
                 >
                   Cancel
@@ -351,10 +400,30 @@ export default function AdminFacultyPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {faculty.map((member, idx) => (
-                <div key={idx} className="bg-slate-900 border border-slate-700 rounded-lg p-6 hover:border-slate-600 transition">
+              {faculty.map((member) => (
+                <div key={member.id} className="bg-slate-900 border border-slate-700 rounded-lg p-6 hover:border-slate-600 transition">
+                  {member.image_url && (
+                    <img src={member.image_url} alt={member.name} className="w-full h-40 object-cover rounded-lg mb-4" />
+                  )}
                   <h3 className="text-lg font-bold text-white">{member.name}</h3>
                   <p className="text-slate-400 text-sm">{member.specialization}</p>
+                  <p className="text-slate-500 text-xs mt-2">{member.email}</p>
+                  
+                  {/* Action Buttons */}
+                  <div className="flex gap-3 mt-4">
+                    <button
+                      onClick={() => handleEdit(member)}
+                      className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-semibold transition"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(member.id)}
+                      className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded font-semibold transition"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
