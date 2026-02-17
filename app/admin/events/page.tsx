@@ -24,7 +24,11 @@ export default function AdminEventsPage() {
   });
   const [mediaFile, setMediaFile] = useState<File | null>(null);
 
-  const handleDrag = (e: any) => {
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.type === 'dragenter' || e.type === 'dragover') {
@@ -34,124 +38,23 @@ export default function AdminEventsPage() {
     }
   };
 
-  const handleDrop = (e: any) => {
+  const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
 
-    const files = e.dataTransfer.files;
-    if (files && files[0]) {
-      handleMediaSelect(files[0]);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleMediaSelect(e.dataTransfer.files[0]);
     }
   };
 
   const handleMediaSelect = (file: File) => {
-    if (file.type.startsWith('image/')) {
-      setMediaFile(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setPreviewImage(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        alert('You must be logged in to create events');
-        setLoading(false);
-        return;
-      }
-
-      let mediaUrl = null;
-
-      // Upload media if provided
-      if (mediaFile) {
-        const fileName = `event-${Date.now()}-${mediaFile.name}`;
-        const { error: uploadError } = await supabase.storage
-          .from('uploads')
-          .upload(`events/${fileName}`, mediaFile);
-
-        if (uploadError) {
-          console.error('Media upload error:', uploadError);
-          alert('Failed to upload media');
-          setLoading(false);
-          return;
-        }
-
-        const { data } = supabase.storage
-          .from('uploads')
-          .getPublicUrl(`events/${fileName}`);
-        mediaUrl = data.publicUrl;
-      }
-
-      // Combine date and time
-      const eventDateTime = formData.event_time 
-        ? `${formData.event_date}T${formData.event_time}`
-        : `${formData.event_date}T00:00`;
-
-      // Update or Insert
-      if (editingId) {
-        const { error: updateError } = await supabase
-          .from('events')
-          .update({
-            title: formData.title,
-            description: formData.description,
-            event_date: eventDateTime,
-            location: formData.location,
-            event_type: formData.event_type,
-            capacity: formData.capacity ? parseInt(formData.capacity) : null,
-            image_url: mediaUrl || previewImage,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', editingId);
-
-        if (updateError) {
-          console.error('Update error:', updateError);
-          alert('Failed to update event: ' + updateError.message);
-        } else {
-          alert('Event updated successfully!');
-          handleCancelEdit();
-          fetchEvents();
-        }
-      } else {
-        // Insert event into database
-        const { error: insertError } = await supabase
-          .from('events')
-          .insert([
-            {
-              title: formData.title,
-              description: formData.description,
-              event_date: eventDateTime,
-              location: formData.location,
-              event_type: formData.event_type,
-              capacity: formData.capacity ? parseInt(formData.capacity) : null,
-              image_url: mediaUrl,
-              created_by: user.id,
-            },
-          ]);
-
-        if (insertError) {
-          console.error('Insert error:', insertError);
-          alert('Failed to create event: ' + insertError.message);
-        } else {
-          alert('Event created successfully!');
-          handleCancelEdit();
-          fetchEvents();
-        }
-      }
-    } catch (error) {
-      console.error('Error creating event:', error);
-      alert('An unexpected error occurred');
-    } finally {
-      setLoading(false);
-    }
+    setMediaFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewImage(reader.result as string);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleDelete = async (id: string) => {
@@ -210,12 +113,112 @@ export default function AdminEventsPage() {
     setShowForm(false);
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        alert('You must be logged in to create events');
+        setLoading(false);
+        return;
+      }
+
+      let mediaUrl = previewImage;
+
+      // Upload media if new file selected
+      if (mediaFile) {
+        const fileName = `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const filePath = `uploads/events/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('events')
+          .upload(filePath, mediaFile);
+
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+          alert('Failed to upload media');
+          setLoading(false);
+          return;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from('events')
+          .getPublicUrl(filePath);
+
+        mediaUrl = publicUrlData.publicUrl;
+      }
+
+      // Combine date and time
+      const eventDateTime = formData.event_time 
+        ? `${formData.event_date}T${formData.event_time}`
+        : `${formData.event_date}T00:00`;
+
+      // Update or Insert
+      if (editingId) {
+        const { error: updateError } = await supabase
+          .from('events')
+          .update({
+            title: formData.title,
+            description: formData.description,
+            event_date: eventDateTime,
+            location: formData.location,
+            event_type: formData.event_type,
+            capacity: formData.capacity ? parseInt(formData.capacity) : null,
+            image_url: mediaUrl || previewImage,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', editingId);
+
+        if (updateError) {
+          console.error('Update error:', updateError);
+          alert('Failed to update event: ' + updateError.message);
+        } else {
+          alert('Event updated successfully!');
+          handleCancelEdit();
+          fetchEvents();
+        }
+      } else {
+        // Insert event into database
+        const { error: insertError } = await supabase
+          .from('events')
+          .insert([
+            {
+              title: formData.title,
+              description: formData.description,
+              event_date: eventDateTime,
+              location: formData.location,
+              event_type: formData.event_type,
+              capacity: formData.capacity ? parseInt(formData.capacity) : null,
+              image_url: mediaUrl,
+              created_by: user.id,
+            },
+          ]);
+
+        if (insertError) {
+          console.error('Insert error:', insertError);
+          alert('Failed to create event: ' + insertError.message);
+        } else {
+          alert('Event created successfully!');
+          handleCancelEdit();
+          fetchEvents();
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('An unexpected error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchEvents = async () => {
     try {
       const { data, error } = await supabase
         .from('events')
         .select('*')
-        .order('event_date', { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (error) {
         console.error('Fetch error:', error);
@@ -227,11 +230,6 @@ export default function AdminEventsPage() {
     }
   };
 
-  // Fetch events on component mount
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       <AdminHeader 
@@ -239,9 +237,7 @@ export default function AdminEventsPage() {
         description="Create and manage school events and seminars"
       />
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Create Event Button */}
         {!showForm && (
           <button
             onClick={() => setShowForm(!showForm)}
@@ -250,10 +246,11 @@ export default function AdminEventsPage() {
             + Create Event
           </button>
         )}
-            
-            <div className="mb-8 bg-slate-800/50 border border-slate-700 rounded-xl p-8">
-              <h2 className="text-2xl font-bold text-white mb-6">{editingId ? 'Edit Event' : 'Create New Event'}</h2>
-            
+
+        {showForm && (
+          <div className="mb-8 bg-slate-800/50 border border-slate-700 rounded-xl p-8">
+            <h2 className="text-2xl font-bold text-white mb-6">{editingId ? 'Edit Event' : 'Create New Event'}</h2>
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="md:col-span-2">
@@ -340,7 +337,7 @@ export default function AdminEventsPage() {
 
               {/* Media Upload */}
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Event Image/Video</label>
+                <label className="block text-sm font-medium text-slate-300 mb-2">Event Image</label>
                 <div
                   onDragEnter={handleDrag}
                   onDragLeave={handleDrag}
@@ -354,44 +351,24 @@ export default function AdminEventsPage() {
                 >
                   <input
                     type="file"
-                    accept="image/*,video/*"
+                    accept="image/*"
                     onChange={(e) => e.target.files && handleMediaSelect(e.target.files[0])}
                     className="hidden"
                     id="media-upload"
                   />
-                  
-                  {previewImage ? (
-            <div className="space-y-4">
-              {events.map((event) => (
-                <div key={event.id} className="bg-slate-900 border border-slate-700 rounded-lg p-6 hover:border-slate-600 transition flex justify-between items-start">
-                  <div>
-                    <h3 className="text-lg font-bold text-white">{event.title}</h3>
-                    <p className="text-slate-400 text-sm">{event.event_date}</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <button 
-                      onClick={() => handleEdit(event)}
-                      className="px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded transition"
-                    >
-                      Edit
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(event.id)}
-                      className="px-3 py-1 text-sm bg-red-600 hover:bg-red-700 text-white rounded transition"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-                  ) : (
-                    <label htmlFor="media-upload" className="cursor-pointer">
-                      <div className="text-4xl mb-2">🎬</div>
-                      <p className="text-slate-300 font-medium">Drag media here or click to upload</p>
-                      <p className="text-slate-500 text-sm">Images or videos up to 50MB</p>
-                    </label>
-                  )}
+                  <label htmlFor="media-upload" className="cursor-pointer">
+                    {previewImage ? (
+                      <div className="space-y-4">
+                        <img src={previewImage} alt="Preview" className="w-48 h-48 object-cover mx-auto rounded-lg" />
+                        <p className="text-slate-400">Click to change image</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <p className="text-slate-300 font-medium">Drag and drop your image here</p>
+                        <p className="text-slate-500">or click to select from your computer</p>
+                      </div>
+                    )}
+                  </label>
                 </div>
               </div>
 
@@ -413,18 +390,19 @@ export default function AdminEventsPage() {
                 </button>
               </div>
             </form>
-            </div>
+          </div>
         )}
 
-        {!loading && events.length > 0 && !showForm && (
+        {events.length > 0 && (
           <div>
-            <h2 className="text-2xl font-bold text-white mb-6">All Events</h2>
+            <h2 className="text-2xl font-bold text-white mb-6">All Events ({events.length})</h2>
             <div className="space-y-4">
               {events.map((event) => (
                 <div key={event.id} className="bg-slate-900 border border-slate-700 rounded-lg p-6 hover:border-slate-600 transition flex justify-between items-start">
                   <div>
                     <h3 className="text-lg font-bold text-white">{event.title}</h3>
-                    <p className="text-slate-400 text-sm">{event.event_date}</p>
+                    <p className="text-slate-400 text-sm">{event.event_date ? new Date(event.event_date).toLocaleDateString() : 'No date'}</p>
+                    <p className="text-slate-500 text-sm mt-2">{event.location}</p>
                   </div>
                   <div className="flex gap-2">
                     <button 
@@ -443,6 +421,12 @@ export default function AdminEventsPage() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {events.length === 0 && !showForm && (
+          <div className="text-center py-12">
+            <p className="text-slate-400 text-lg">No events created yet. Create your first event to get started.</p>
           </div>
         )}
       </main>
