@@ -1,28 +1,105 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
 export default function AdminCoursesPage() {
+  const supabase = createClient();
   const [courses, setCourses] = useState<any[]>([]);
+  const [faculty, setFaculty] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [loading, setLoading] = useState(false);
   
   const [formData, setFormData] = useState({
     title: '',
     code: '',
     description: '',
     credits: '3',
-    faculty: '',
+    faculty_id: '',
     semester: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Save course
-    console.log('Course data:', formData);
-    setFormData({ title: '', code: '', description: '', credits: '3', faculty: '', semester: '' });
-    setShowForm(false);
-    alert('Course created successfully!');
+    setLoading(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        alert('You must be logged in to create courses');
+        setLoading(false);
+        return;
+      }
+
+      const { error: insertError } = await supabase
+        .from('courses')
+        .insert([
+          {
+            title: formData.title,
+            code: formData.code,
+            description: formData.description,
+            credits: parseInt(formData.credits),
+            faculty_id: formData.faculty_id || null,
+            semester: formData.semester,
+            created_by: user.id,
+          },
+        ]);
+
+      if (insertError) {
+        console.error('Insert error:', insertError);
+        alert('Failed to create course: ' + insertError.message);
+      } else {
+        alert('Course created successfully!');
+        setFormData({ title: '', code: '', description: '', credits: '3', faculty_id: '', semester: '' });
+        setShowForm(false);
+        fetchCourses();
+      }
+    } catch (error) {
+      console.error('Error creating course:', error);
+      alert('An unexpected error occurred');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const fetchCourses = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('courses')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Fetch error:', error);
+      } else {
+        setCourses(data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching courses:', error);
+    }
+  };
+
+  const fetchFaculty = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('faculty')
+        .select('id, name')
+        .order('name');
+
+      if (error) {
+        console.error('Fetch faculty error:', error);
+      } else {
+        setFaculty(data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching faculty:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCourses();
+    fetchFaculty();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
@@ -88,13 +165,16 @@ export default function AdminCoursesPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-300 mb-2">Faculty</label>
-                  <input
-                    type="text"
-                    value={formData.faculty}
-                    onChange={(e) => setFormData({...formData, faculty: e.target.value})}
+                  <select
+                    value={formData.faculty_id}
+                    onChange={(e) => setFormData({...formData, faculty_id: e.target.value})}
                     className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:border-green-500 focus:outline-none transition"
-                    placeholder="Dr. John Doe"
-                  />
+                  >
+                    <option value="">Select Faculty Member</option>
+                    {faculty.map((f) => (
+                      <option key={f.id} value={f.id}>{f.name}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div>
