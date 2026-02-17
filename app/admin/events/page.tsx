@@ -414,4 +414,38 @@ export default function AdminEventsPage() {
               </div>
             </form>
             </div>
-        )
+        )}
+
+        {!loading && events.length > 0 && !showForm && (
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-6">All Events</h2>
+            <div className="space-y-4">
+              {events.map((event) => (
+                <div key={event.id} className="bg-slate-900 border border-slate-700 rounded-lg p-6 hover:border-slate-600 transition flex justify-between items-start">
+                  <div>
+                    <h3 className="text-lg font-bold text-white">{event.title}</h3>
+                    <p className="text-slate-400 text-sm">{event.event_date}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => handleEdit(event)}
+                      className="px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded transition"
+                    >
+                      Edit
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(event.id)}
+                      className="px-3 py-1 text-sm bg-red-600 hover:bg-red-700 text-white rounded transition"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
