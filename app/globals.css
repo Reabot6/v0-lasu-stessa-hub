@@ -185,11 +185,6 @@
   .animate-pulse-glow {
     @apply animate-[pulseGlow_2s_ease-in-out_infinite];
   }
-
-  /* Border color utility */
-  .border-border {
-    @apply border-slate-700;
-  }
 }
 
 .dark {
