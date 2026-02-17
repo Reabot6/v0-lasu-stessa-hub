@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Navigation } from '@/components/navigation';
 import { ResourcesContent } from '@/components/resources-content';
+import { ModuleLoading } from '@/components/module-loading';
 import { getResources, getCourses, Resource, Course, isAdminLoggedIn } from '@/lib/storage';
 
 export default function ResourcesPage() {
@@ -42,8 +43,8 @@ export default function ResourcesPage() {
             </p>
           </div>
         </section>
-        <div className="py-12 text-center">
-          <p className="text-lg text-foreground/60">Loading resources...</p>
+        <div className="py-20 flex items-center justify-center min-h-[60vh]">
+          <ModuleLoading moduleType="resources" />
         </div>
       </div>
     );

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Navigation } from '@/components/navigation';
+import { ModuleLoading } from '@/components/module-loading';
 import { getNews, NewsItem, isAdminLoggedIn } from '@/lib/storage';
 
 export default function NewsPage() {
@@ -67,8 +68,8 @@ export default function NewsPage() {
 
           {/* News Items */}
           {loading ? (
-            <div className="text-center py-12">
-              <p className="text-lg text-foreground/60">Loading news...</p>
+            <div className="flex items-center justify-center py-20 min-h-[60vh]">
+              <ModuleLoading moduleType="news" />
             </div>
           ) : filteredNews.length > 0 ? (
             <div className="space-y-6">
