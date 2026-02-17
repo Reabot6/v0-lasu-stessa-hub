@@ -2,6 +2,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme inline {
+  /* Define border-border color */
+  --color-border-border: rgb(51, 65, 85);
+}
+
 :root {
   /* Premium Educational Theme - Brown, Cream, Warm Tones */
   --background: #faf8f3;              /* Warm cream background */
@@ -189,7 +194,8 @@
 
 /* Compatibility utility for border-border class */
 .border-border {
-  border-color: rgb(51, 65, 85);
+  --tw-border-opacity: 1;
+  border-color: rgb(51 65 85 / var(--tw-border-opacity));
 }
 
 .dark {
