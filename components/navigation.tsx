@@ -116,13 +116,28 @@ export function Navigation() {
         </div>
       </nav>
 
-      {/* Mobile Navigation Menu - Slides from Top */}
+      {/* Mobile Navigation Menu - Slides from Right */}
       <div
-        className={`fixed top-20 left-0 right-0 w-full bg-white shadow-2xl transform transition-all duration-300 ease-out z-40 lg:hidden border-b-2 border-accent/20 ${
-          mobileMenuOpen ? 'translate-y-0 opacity-100 visible' : '-translate-y-full opacity-0 invisible'
+        className={`fixed top-0 right-0 h-screen w-80 bg-white shadow-2xl transform transition-all duration-300 ease-out z-40 lg:hidden border-l-2 border-accent/20 flex flex-col ${
+          mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="max-w-7xl mx-auto p-6 space-y-4">
+        {/* Header with Close Button */}
+        <div className="flex items-center justify-between p-6 border-b border-accent/20">
+          <h2 className="text-xl font-bold text-primary">Menu</h2>
+          <button
+            onClick={() => setMobileMenuOpen(false)}
+            className="p-2 hover:bg-accent/10 rounded-lg transition-all"
+            title="Close menu"
+          >
+            <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Menu Content */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Mobile Menu Items */}
           <div className="space-y-2">
             {navItems.map((item) => (
@@ -181,7 +196,7 @@ export function Navigation() {
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/30 z-30 lg:hidden"
+          className="fixed inset-0 bg-black/30 z-30 lg:hidden transition-opacity duration-300"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}

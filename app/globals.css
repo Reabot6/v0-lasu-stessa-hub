@@ -46,6 +46,147 @@
   --sidebar-ring: #c9a961;
 }
 
+/* Custom Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOutDown {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@keyframes floatX {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(10px);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(201, 169, 97, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(201, 169, 97, 0.6);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in-up {
+    @apply animate-[fadeInUp_0.6s_ease-out];
+  }
+  
+  .animate-fade-out-down {
+    @apply animate-[fadeOutDown_0.6s_ease-out];
+  }
+  
+  .animate-fade-in {
+    @apply animate-[fadeIn_0.8s_ease-out];
+  }
+  
+  .animate-fade-out {
+    @apply animate-[fadeOut_0.8s_ease-out];
+  }
+  
+  .animate-slide-in-right {
+    @apply animate-[slideInRight_0.5s_ease-out];
+  }
+  
+  .animate-slide-out-right {
+    @apply animate-[slideOutRight_0.5s_ease-out];
+  }
+  
+  .animate-float-x {
+    @apply animate-[floatX_3s_ease-in-out_infinite];
+  }
+  
+  .animate-glow {
+    @apply animate-[glow_2s_ease-in-out_infinite];
+  }
+  
+  .animate-shimmer {
+    @apply animate-[shimmer_3s_linear_infinite];
+  }
+  
+  .animate-pulse-glow {
+    @apply animate-[pulseGlow_2s_ease-in-out_infinite];
+  }
+}
+
 .dark {
   color-scheme: dark;
 }

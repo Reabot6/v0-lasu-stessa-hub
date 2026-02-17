@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 
 const carouselImages = [
@@ -21,6 +21,8 @@ const carouselImages = [
 export function PremiumHero() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlay, setIsAutoPlay] = useState(true);
+  const [scrollY, setScrollY] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isAutoPlay) return;
@@ -31,6 +33,18 @@ export function PremiumHero() {
 
     return () => clearInterval(interval);
   }, [isAutoPlay]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const scrollPercent = Math.max(0, Math.min(1, (window.innerHeight - rect.top) / window.innerHeight));
+      setScrollY(scrollPercent);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const goToSlide = (index: number) => {
     setCurrentSlide(index);
@@ -48,7 +62,7 @@ export function PremiumHero() {
   };
 
   return (
-    <section className="relative w-full overflow-hidden">
+    <section ref={containerRef} className="relative w-full overflow-hidden">
       {/* Carousel Container */}
       <div className="relative w-full h-[400px] sm:h-[500px] lg:h-[600px] group">
         {/* Slides */}
@@ -58,6 +72,10 @@ export function PremiumHero() {
             className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
               index === currentSlide ? 'opacity-100' : 'opacity-0'
             }`}
+            style={{
+              transform: `translateY(${scrollY * 30}px)`,
+              transition: 'transform 0.1s ease-out',
+            }}
           >
             <Image
               src={image.url}
@@ -67,10 +85,16 @@ export function PremiumHero() {
               priority={index === 0}
             />
             {/* Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
             
             {/* Content */}
-            <div className="absolute inset-0 flex flex-col items-center justify-end pb-12 sm:pb-16 lg:pb-20 px-4">
+            <div 
+              className="absolute inset-0 flex flex-col items-center justify-end pb-12 sm:pb-16 lg:pb-20 px-4"
+              style={{
+                opacity: 1 - scrollY * 0.3,
+                transform: `translateY(${scrollY * 20}px)`,
+              }}
+            >
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white text-center mb-6 animate-fade-in">
                 Welcome to <span className="text-accent">STE</span>
               </h2>
@@ -81,17 +105,17 @@ export function PremiumHero() {
                 Your comprehensive hub for accessing courses, learning resources, and staying updated with departmental announcements.
               </p>
               
-              {/* CTA Buttons */}
+              {/* CTA Buttons with Black Background */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in">
                 <a
                   href="#academics"
-                  className="inline-flex items-center justify-center px-8 py-3 rounded-lg bg-accent text-accent-foreground font-semibold hover:bg-accent/90 transition-all hover:shadow-lg hover:scale-105 transform duration-300"
+                  className="inline-flex items-center justify-center px-8 py-3 rounded-lg bg-black/70 hover:bg-black text-white font-semibold transition-all hover:shadow-lg hover:scale-105 transform duration-300 backdrop-blur-sm border border-white/20"
                 >
                   Explore Courses
                 </a>
                 <a
                   href="#resources"
-                  className="inline-flex items-center justify-center px-8 py-3 rounded-lg border-2 border-white text-white font-semibold hover:bg-white/10 transition-all duration-300"
+                  className="inline-flex items-center justify-center px-8 py-3 rounded-lg bg-black/70 hover:bg-black text-white font-semibold transition-all duration-300 backdrop-blur-sm border border-white/20 hover:shadow-lg hover:scale-105 transform"
                 >
                   Browse Resources
                 </a>
@@ -103,7 +127,7 @@ export function PremiumHero() {
         {/* Previous Button */}
         <button
           onClick={prevSlide}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white/20 hover:bg-white/40 transition-all duration-300 text-white opacity-0 group-hover:opacity-100 transform hover:scale-110"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-black/50 hover:bg-black/70 transition-all duration-300 text-white opacity-0 group-hover:opacity-100 transform hover:scale-110"
           aria-label="Previous slide"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -114,7 +138,7 @@ export function PremiumHero() {
         {/* Next Button */}
         <button
           onClick={nextSlide}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white/20 hover:bg-white/40 transition-all duration-300 text-white opacity-0 group-hover:opacity-100 transform hover:scale-110"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-black/50 hover:bg-black/70 transition-all duration-300 text-white opacity-0 group-hover:opacity-100 transform hover:scale-110"
           aria-label="Next slide"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
