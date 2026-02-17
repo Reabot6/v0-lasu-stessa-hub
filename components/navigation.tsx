@@ -41,8 +41,11 @@ export function Navigation() {
   const navItems = [
     { href: '/', label: 'Home' },
     { href: '/academics', label: 'Academics' },
-    { href: '/resources', label: 'Resources' },
-    { href: '/news', label: 'News' },
+    { href: '/dashboard', label: 'Dashboard' },
+    { href: '/enroll', label: 'Enroll' },
+    { href: '/events', label: 'Events' },
+    { href: '/faculty', label: 'Faculty' },
+    { href: '/faq', label: 'FAQ' },
   ];
 
   return (
