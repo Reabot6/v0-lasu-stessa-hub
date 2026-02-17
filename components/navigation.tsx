@@ -290,13 +290,13 @@ export function Navigation() {
         </div>
 
         {/* Search Panel (Full Screen) */}
-        {showSearch && (
-          <div className="absolute top-full left-0 right-0 bg-gradient-to-b from-[rgba(10,15,28,0.95)] to-[rgba(10,15,28,0.8)] border-t border-[#00f5ff]/30 p-8">
+        {false && (
+          <div className="absolute top-full left-0 right-0 bg-white border-t border-accent/20 p-8">
             <div className="max-w-2xl mx-auto">
               <input
                 type="text"
                 placeholder="Search courses, resources, news..."
-                className="w-full px-4 py-3 bg-rgba(0,245,255,0.05) border border-[#00f5ff]/50 rounded-lg text-[#e0e6ff] placeholder-[#a0a6b8]/50 focus:border-[#00f5ff] focus:outline-none focus:neon-glow-cyan transition-all"
+                className="w-full px-4 py-3 bg-background border border-accent/50 rounded-lg text-foreground placeholder-muted-foreground/50 focus:border-accent focus:outline-none transition-all"
                 autoFocus
               />
             </div>
@@ -304,12 +304,9 @@ export function Navigation() {
         )}
       </nav>
 
-      {/* Spacer for fixed nav */}
-      <div className="h-[7.5rem] sm:h-[8.5rem]" />
-
       {/* Mobile Navigation Menu */}
       <div
-        className={`fixed top-0 right-0 h-full w-72 glass-neon transform transition-transform duration-300 ease-out z-40 lg:hidden pt-20 ${
+        className={`fixed top-[4rem] right-0 h-screen w-72 bg-white shadow-2xl transform transition-transform duration-300 ease-out z-40 lg:hidden border-l-2 border-accent/20 overflow-y-auto ${
           mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
@@ -317,7 +314,7 @@ export function Navigation() {
           {/* Close Button */}
           <button
             onClick={() => setMobileMenuOpen(false)}
-            className="absolute top-6 right-6 text-2xl neon-text-cyan hover:opacity-70"
+            className="absolute top-6 right-6 text-2xl text-primary hover:opacity-60"
           >
             ✕
           </button>
@@ -328,10 +325,10 @@ export function Navigation() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`block px-4 py-3 rounded-lg transition-all duration-300 uppercase text-sm font-bold tracking-wider ${
+                className={`block px-4 py-3 rounded-lg transition-all duration-300 font-semibold ${
                   isActive(item.href)
-                    ? 'bg-[#9d00ff]/30 border border-[#9d00ff] text-[#9d00ff]'
-                    : 'text-[#a0a6b8] hover:text-[#00f5ff] hover:bg-[#00f5ff]/10'
+                    ? 'bg-accent/20 text-primary border-l-4 border-accent'
+                    : 'text-muted-foreground hover:bg-accent/10'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -341,7 +338,7 @@ export function Navigation() {
           </div>
 
           {/* Divider */}
-          <div className="border-t border-[#00f5ff]/20" />
+          <div className="border-t border-border" />
 
           {/* Admin Section */}
           <div className="space-y-3">
@@ -349,7 +346,7 @@ export function Navigation() {
               <>
                 <Link
                   href="/admin"
-                  className="block px-4 py-3 rounded-lg bg-[#9d00ff]/30 border border-[#9d00ff] text-[#9d00ff] font-bold text-center text-sm"
+                  className="block px-4 py-3 rounded-lg bg-secondary/20 text-secondary font-bold text-center text-sm hover:bg-secondary/30 transition"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Admin Panel
@@ -359,7 +356,7 @@ export function Navigation() {
                     handleLogout();
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full px-4 py-3 rounded-lg bg-[#ff0055]/30 border border-[#ff0055] text-[#ff0055] font-bold text-sm"
+                  className="w-full px-4 py-3 rounded-lg bg-destructive/20 text-destructive font-bold text-sm hover:bg-destructive/30 transition"
                 >
                   Logout
                 </button>
@@ -367,7 +364,7 @@ export function Navigation() {
             ) : (
               <Link
                 href="/admin/login"
-                className="block px-4 py-3 rounded-lg cyber-button purple text-center"
+                className="block px-4 py-3 rounded-lg bg-accent text-accent-foreground font-bold text-center text-sm hover:bg-accent/90 transition"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Admin Login
@@ -380,7 +377,7 @@ export function Navigation() {
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          className="fixed inset-0 bg-black/30 z-30 lg:hidden"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
