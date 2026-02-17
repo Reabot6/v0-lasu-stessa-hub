@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { AdminHeader } from '@/components/admin-header';
 
 export default function AdminCoursesPage() {
   const supabase = createClient();
@@ -9,6 +10,7 @@ export default function AdminCoursesPage() {
   const [faculty, setFaculty] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
     title: '',
@@ -18,6 +20,54 @@ export default function AdminCoursesPage() {
     faculty_id: '',
     semester: '',
   });
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this course?')) return;
+    
+    try {
+      const { error } = await supabase
+        .from('courses')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        alert('Failed to delete course');
+      } else {
+        alert('Course deleted successfully');
+        fetchCourses();
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      alert('Error deleting course');
+    }
+  };
+
+  const handleEdit = (course: any) => {
+    setEditingId(course.id);
+    setFormData({
+      title: course.title,
+      code: course.code,
+      description: course.description || '',
+      credits: course.credits ? course.credits.toString() : '3',
+      faculty_id: course.faculty_id || '',
+      semester: course.semester || '',
+    });
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setFormData({
+      title: '',
+      code: '',
+      description: '',
+      credits: '3',
+      faculty_id: '',
+      semester: '',
+    });
+    setShowForm(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,28 +81,51 @@ export default function AdminCoursesPage() {
         return;
       }
 
-      const { error: insertError } = await supabase
-        .from('courses')
-        .insert([
-          {
+      if (editingId) {
+        const { error: updateError } = await supabase
+          .from('courses')
+          .update({
             title: formData.title,
             code: formData.code,
             description: formData.description,
             credits: parseInt(formData.credits),
             faculty_id: formData.faculty_id || null,
             semester: formData.semester,
-            created_by: user.id,
-          },
-        ]);
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', editingId);
 
-      if (insertError) {
-        console.error('Insert error:', insertError);
-        alert('Failed to create course: ' + insertError.message);
+        if (updateError) {
+          console.error('Update error:', updateError);
+          alert('Failed to update course: ' + updateError.message);
+        } else {
+          alert('Course updated successfully!');
+          handleCancelEdit();
+          fetchCourses();
+        }
       } else {
-        alert('Course created successfully!');
-        setFormData({ title: '', code: '', description: '', credits: '3', faculty_id: '', semester: '' });
-        setShowForm(false);
-        fetchCourses();
+        const { error: insertError } = await supabase
+          .from('courses')
+          .insert([
+            {
+              title: formData.title,
+              code: formData.code,
+              description: formData.description,
+              credits: parseInt(formData.credits),
+              faculty_id: formData.faculty_id || null,
+              semester: formData.semester,
+              created_by: user.id,
+            },
+          ]);
+
+        if (insertError) {
+          console.error('Insert error:', insertError);
+          alert('Failed to create course: ' + insertError.message);
+        } else {
+          alert('Course created successfully!');
+          handleCancelEdit();
+          fetchCourses();
+        }
       }
     } catch (error) {
       console.error('Error creating course:', error);
@@ -103,27 +176,23 @@ export default function AdminCoursesPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-white">Courses Management</h1>
-              <p className="text-slate-400 mt-1">Create and manage academic courses</p>
-            </div>
-            <button
-              onClick={() => setShowForm(!showForm)}
-              className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105 active:scale-95"
-            >
-              + Add Course
-            </button>
-          </div>
-        </div>
-      </header>
+      <AdminHeader 
+        title="Courses Management" 
+        description="Create and manage academic courses"
+      />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {!showForm && (
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="mb-8 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105 active:scale-95"
+          >
+            + Add Course
+          </button>
+        )}
         {showForm && (
           <div className="mb-8 bg-slate-800/50 border border-slate-700 rounded-xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-6">Add New Course</h2>
+            <h2 className="text-2xl font-bold text-white mb-6">{editingId ? 'Edit Course' : 'Add New Course'}</h2>
             
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -210,8 +279,15 @@ export default function AdminCoursesPage() {
                   Add Course
                 </button>
                 <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50"
+                >
+                  {loading ? (editingId ? 'Updating...' : 'Creating...') : (editingId ? 'Update Course' : 'Create Course')}
+                </button>
+                <button
                   type="button"
-                  onClick={() => setShowForm(false)}
+                  onClick={handleCancelEdit}
                   className="px-6 py-3 bg-slate-700 text-white rounded-lg font-semibold hover:bg-slate-600 transition"
                 >
                   Cancel
@@ -231,15 +307,25 @@ export default function AdminCoursesPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {courses.map((course, idx) => (
-                <div key={idx} className="bg-slate-900 border border-slate-700 rounded-lg p-6 flex justify-between items-start">
+              {courses.map((course) => (
+                <div key={course.id} className="bg-slate-900 border border-slate-700 rounded-lg p-6 flex justify-between items-start">
                   <div>
                     <h3 className="text-lg font-bold text-white">{course.title}</h3>
                     <p className="text-slate-400 text-sm">{course.code}</p>
                   </div>
                   <div className="flex gap-2">
-                    <button className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition">Edit</button>
-                    <button className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition">Delete</button>
+                    <button 
+                      onClick={() => handleEdit(course)}
+                      className="px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded transition"
+                    >
+                      Edit
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(course.id)}
+                      className="px-3 py-1 text-sm bg-red-600 hover:bg-red-700 text-white rounded transition"
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
               ))}
