@@ -36,17 +36,6 @@ export function Navigation() {
 
   return (
     <>
-      {/* LASU Motto Banner */}
-      <div className="bg-primary text-primary-foreground overflow-hidden py-2 relative">
-        <div className="animate-scroll whitespace-nowrap flex relative z-10">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <span key={i} className="inline-block text-sm sm:text-base md:text-lg font-bold px-8">
-              We are LASU We are Great
-            </span>
-          ))}
-        </div>
-      </div>
-
       {/* Navigation Bar */}
       <nav className="bg-white shadow-md border-b-2 border-accent/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -112,10 +101,11 @@ export function Navigation() {
                 </Link>
               )}
 
-              {/* Mobile Menu Button */}
+              {/* Mobile Menu Button - Now Visible */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden w-8 h-8 flex flex-col justify-center gap-1.5"
+                className="lg:hidden flex flex-col justify-center gap-1.5 p-2 hover:bg-accent/10 rounded-lg transition-all"
+                title="Menu"
               >
                 <span className={`w-6 h-0.5 bg-primary transition-all duration-300 ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
                 <span className={`w-6 h-0.5 bg-primary transition-all duration-300 ${mobileMenuOpen ? 'opacity-0' : ''}`} />
@@ -126,23 +116,15 @@ export function Navigation() {
         </div>
       </nav>
 
-      {/* Mobile Navigation Menu */}
+      {/* Mobile Navigation Menu - Slides from Top */}
       <div
-        className={`fixed top-20 right-0 h-screen w-72 bg-white shadow-2xl transform transition-transform duration-300 ease-out z-40 lg:hidden border-l-2 border-accent/20 ${
-          mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        className={`fixed top-20 left-0 right-0 w-full bg-white shadow-2xl transform transition-all duration-300 ease-out z-40 lg:hidden border-b-2 border-accent/20 ${
+          mobileMenuOpen ? 'translate-y-0 opacity-100 visible' : '-translate-y-full opacity-0 invisible'
         }`}
       >
-        <div className="p-6 space-y-6">
-          {/* Close Button */}
-          <button
-            onClick={() => setMobileMenuOpen(false)}
-            className="absolute top-6 right-6 text-2xl text-primary hover:opacity-60"
-          >
-            ✕
-          </button>
-
+        <div className="max-w-7xl mx-auto p-6 space-y-4">
           {/* Mobile Menu Items */}
-          <div className="pt-4 space-y-2">
+          <div className="space-y-2">
             {navItems.map((item) => (
               <Link
                 key={item.href}
