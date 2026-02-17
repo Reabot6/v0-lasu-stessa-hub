@@ -2,110 +2,164 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Navigation } from '@/components/navigation';
-import { verifyAdmin, setAdminSession } from '@/lib/storage';
+import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
 
 export default function AdminLoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const router = useRouter();
+  const supabase = createClient();
+
+  const validateEmail = (email: string): boolean => {
+    return email.endsWith('@lasu.edu.ng') || email === 'stessaedu@gmail.com';
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
+    setError(null);
 
-    if (!email || !password) {
-      setError('Please enter both email and password');
-      setLoading(false);
+    if (!validateEmail(email)) {
+      setError('Please use a @lasu.edu.ng email or stessaedu@gmail.com');
       return;
     }
 
+    setLoading(true);
+
     try {
-      const isValid = await verifyAdmin(email, password);
-      if (isValid) {
-        const token = btoa(`${email}:${Date.now()}`);
-        setAdminSession(token);
-        router.push('/admin');
-      } else {
-        setError('Invalid email or password');
-        setLoading(false);
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (authError) {
+        setError(authError.message);
+      } else if (data.user) {
+        setSuccess(true);
+        localStorage.setItem('admin_onboarding_shown', 'false');
+        setTimeout(() => {
+          router.push('/admin/dashboard');
+        }, 1500);
       }
     } catch (err) {
-      setError('An error occurred during login. Please try again.');
+      setError('An unexpected error occurred');
+      console.error(err);
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex items-center justify-center px-4 py-8">
+      {/* Animated background elements */}
+      <div className="absolute top-20 right-20 w-72 h-72 bg-accent/10 rounded-full blur-3xl animate-float-x opacity-30" />
+      <div className="absolute bottom-20 left-20 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-pulse-glow opacity-20" />
 
-      <section className="py-12 bg-background">
-        <div className="max-w-md mx-auto px-4">
-          <div className="resource-card">
-            <h1 className="text-3xl font-bold text-primary mb-2 text-center">Admin Login</h1>
-            <p className="text-center text-foreground/60 mb-8">
-              Access the admin dashboard to manage content
-            </p>
+      <div className="w-full max-w-md relative z-10">
+        {/* Card Container */}
+        <div className={`p-8 sm:p-10 rounded-2xl backdrop-blur-sm border-2 bg-black shadow-2xl transition-all duration-500 transform ${
+          success ? 'scale-95 opacity-0' : 'scale-100 opacity-100'
+        }`}>
+          {/* Header */}
+          <div className="mb-8 text-center animate-fade-in-up">
+            <div className="mb-4 text-5xl">🔐</div>
+            <h1 className="text-3xl font-bold text-white mb-2">Admin Portal</h1>
+            <p className="text-gray-300">LASU Faculty & Staff Access</p>
+          </div>
 
+          {/* Form */}
+          <form onSubmit={handleLogin} className="space-y-6">
+            {/* Email Input */}
+            <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+              <label className="block text-sm font-semibold text-white mb-2">
+                LASU Email Address
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@lasu.edu.ng"
+                required
+                className="w-full px-4 py-3 rounded-lg border-2 border-gray-600 bg-gray-900 text-white placeholder-gray-400 transition-all duration-300 focus:border-accent focus:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-accent/30 hover:border-gray-500"
+              />
+              <p className="text-xs text-gray-400 mt-2">Use your @lasu.edu.ng email or stessaedu@gmail.com</p>
+            </div>
+
+            {/* Password Input */}
+            <div className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+              <label className="block text-sm font-semibold text-white mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                className="w-full px-4 py-3 rounded-lg border-2 border-gray-600 bg-gray-900 text-white placeholder-gray-400 transition-all duration-300 focus:border-accent focus:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-accent/30 hover:border-gray-500"
+              />
+            </div>
+
+            {/* Error Message */}
             {error && (
-              <div className="bg-destructive/10 text-destructive border border-destructive/20 px-4 py-3 rounded-lg mb-6">
+              <div className="p-4 rounded-lg bg-destructive/20 border border-destructive text-red-300 text-sm animate-fade-in-up">
                 {error}
               </div>
             )}
 
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="stessaedu@gmail.com"
-                  className="w-full px-4 py-2 border border-border rounded-lg bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                />
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 rounded-lg font-bold bg-accent text-white hover:bg-accent/90 transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 animate-fade-in-up"
+              style={{ animationDelay: '0.3s' }}
+            >
+              {loading ? (
+                <>
+                  <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Logging in...
+                </>
+              ) : (
+                'Sign In to Dashboard'
+              )}
+            </button>
+
+            {/* Success Message */}
+            {success && (
+              <div className="p-4 rounded-lg bg-accent/20 border border-accent text-accent text-sm text-center font-semibold animate-fade-in-up">
+                ✓ Login successful! Redirecting...
               </div>
+            )}
+          </form>
 
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full px-4 py-2 border border-border rounded-lg bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
+          {/* Signup Link */}
+          <div className="mt-8 text-center pt-6 border-t border-gray-700">
+            <p className="text-sm text-gray-300">
+              Don't have an account?{' '}
+              <Link href="/admin/sign-up" className="font-semibold text-accent hover:text-accent/80 transition-colors">
+                Create one
+              </Link>
+            </p>
+          </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full btn-primary text-center font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? 'Logging in...' : 'Login'}
-              </button>
-            </form>
-
-
+          {/* Back to Student Login */}
+          <div className="mt-4 text-center">
+            <p className="text-sm text-gray-300">
+              Student?{' '}
+              <Link href="/auth/login" className="font-semibold text-accent hover:text-accent/80 transition-colors">
+                Login here
+              </Link>
+            </p>
           </div>
         </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-primary text-primary-foreground py-8 mt-16">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <p className="opacity-80">
-            &copy; 2024 LASU STESSA. All rights reserved.
-          </p>
-        </div>
-      </footer>
+      </div>
     </div>
   );
 }
+

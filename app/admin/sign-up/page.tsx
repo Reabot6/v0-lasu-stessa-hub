@@ -5,33 +5,72 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 
-export default function LoginPage() {
+export default function AdminSignUpPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const validateEmail = (email: string): boolean => {
+    return email.endsWith('@lasu.edu.ng') || email === 'stessaedu@gmail.com';
+  };
+
+  const validatePassword = (password: string): boolean => {
+    return password.length >= 8;
+  };
+
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (!validateEmail(email)) {
+      setError('Please use a @lasu.edu.ng email or stessaedu@gmail.com');
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      setError('Password must be at least 8 characters long');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (!fullName.trim()) {
+      setError('Please enter your full name');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
+      const { data, error: authError } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            full_name: fullName,
+            user_type: 'admin',
+          },
+          emailRedirectTo: `${window.location.origin}/admin/dashboard`,
+        },
       });
 
       if (authError) {
         setError(authError.message);
       } else if (data.user) {
         setSuccess(true);
+        localStorage.setItem('admin_onboarding_shown', 'false');
         setTimeout(() => {
-          router.push('/');
-        }, 1500);
+          router.push('/admin/sign-up-success');
+        }, 2000);
       }
     } catch (err) {
       setError('An unexpected error occurred');
@@ -54,26 +93,42 @@ export default function LoginPage() {
         }`}>
           {/* Header */}
           <div className="mb-8 text-center animate-fade-in-up">
-            <div className="mb-4 text-5xl">🎓</div>
-            <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
-            <p className="text-gray-300">Sign in to access your courses and resources</p>
+            <div className="mb-4 text-5xl">📝</div>
+            <h1 className="text-3xl font-bold text-white mb-2">Admin Sign Up</h1>
+            <p className="text-gray-300">LASU Faculty & Staff Registration</p>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleLogin} className="space-y-6">
-            {/* Email Input */}
+          <form onSubmit={handleSignUp} className="space-y-5">
+            {/* Full Name Input */}
             <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
               <label className="block text-sm font-semibold text-white mb-2">
-                Email Address
+                Full Name
+              </label>
+              <input
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="Dr. John Doe"
+                required
+                className="w-full px-4 py-3 rounded-lg border-2 border-gray-600 bg-gray-900 text-white placeholder-gray-400 transition-all duration-300 focus:border-accent focus:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-accent/30 hover:border-gray-500"
+              />
+            </div>
+
+            {/* Email Input */}
+            <div className="animate-fade-in-up" style={{ animationDelay: '0.15s' }}>
+              <label className="block text-sm font-semibold text-white mb-2">
+                LASU Email Address
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
+                placeholder="name@lasu.edu.ng"
                 required
                 className="w-full px-4 py-3 rounded-lg border-2 border-gray-600 bg-gray-900 text-white placeholder-gray-400 transition-all duration-300 focus:border-accent focus:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-accent/30 hover:border-gray-500"
               />
+              <p className="text-xs text-gray-400 mt-2">Use your @lasu.edu.ng email or stessaedu@gmail.com</p>
             </div>
 
             {/* Password Input */}
@@ -85,6 +140,22 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                className="w-full px-4 py-3 rounded-lg border-2 border-gray-600 bg-gray-900 text-white placeholder-gray-400 transition-all duration-300 focus:border-accent focus:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-accent/30 hover:border-gray-500"
+              />
+              <p className="text-xs text-gray-400 mt-2">Minimum 8 characters</p>
+            </div>
+
+            {/* Confirm Password Input */}
+            <div className="animate-fade-in-up" style={{ animationDelay: '0.25s' }}>
+              <label className="block text-sm font-semibold text-white mb-2">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
                 required
                 className="w-full px-4 py-3 rounded-lg border-2 border-gray-600 bg-gray-900 text-white placeholder-gray-400 transition-all duration-300 focus:border-accent focus:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-accent/30 hover:border-gray-500"
@@ -111,60 +182,41 @@ export default function LoginPage() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  Signing in...
+                  Creating account...
                 </>
               ) : (
-                'Sign In'
+                'Create Admin Account'
               )}
             </button>
+
+            {/* Success Message */}
+            {success && (
+              <div className="p-4 rounded-lg bg-accent/20 border border-accent text-accent text-sm text-center font-semibold animate-fade-in-up">
+                ✓ Account created! Redirecting...
+              </div>
+            )}
           </form>
 
-          {/* Divider */}
-          <div className="my-6 flex items-center gap-4 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent to-gray-700" />
-            <span className="text-xs text-gray-400 font-semibold">OR</span>
-            <div className="flex-1 h-px bg-gradient-to-l from-transparent to-gray-700" />
-          </div>
-
-          {/* Sign Up Link */}
-          <div className="text-center animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
-            <p className="text-gray-300">
-              Don't have an account?{' '}
-              <Link
-                href="/auth/sign-up"
-                className="font-bold text-accent hover:text-accent/80 transition-colors duration-300 underline decoration-accent/30 hover:decoration-accent"
-              >
-                Create one
+          {/* Login Link */}
+          <div className="mt-8 text-center pt-6 border-t border-gray-700">
+            <p className="text-sm text-gray-300">
+              Already have an account?{' '}
+              <Link href="/admin/login" className="font-semibold text-accent hover:text-accent/80 transition-colors">
+                Sign in
               </Link>
             </p>
           </div>
 
-          {/* Admin Login Link */}
-          <div className="text-center mt-4 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-            <p className="text-gray-300">
-              Admin?{' '}
-              <Link
-                href="/admin/login"
-                className="font-bold text-white hover:text-gray-200 transition-colors duration-300 underline decoration-white/30 hover:decoration-white"
-              >
+          {/* Student Login Link */}
+          <div className="mt-4 text-center">
+            <p className="text-sm text-gray-300">
+              Student?{' '}
+              <Link href="/auth/login" className="font-semibold text-accent hover:text-accent/80 transition-colors">
                 Login here
               </Link>
             </p>
           </div>
         </div>
-
-        {/* Success Message */}
-        {success && (
-          <div className="text-center animate-fade-in-up">
-            <div className="inline-block p-6 rounded-full bg-green-100/50 border-2 border-green-400 mb-4 animate-pulse-glow">
-              <svg className="w-12 h-12 text-green-600 animate-spin" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <p className="text-lg font-bold text-primary">Sign in successful!</p>
-            <p className="text-foreground/60 text-sm">Redirecting...</p>
-          </div>
-        )}
       </div>
     </div>
   );

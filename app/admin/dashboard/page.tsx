@@ -4,11 +4,13 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { AdminOnboardingFlow } from '@/components/admin-onboarding-flow';
 
 export default function AdminDashboard() {
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
@@ -18,7 +20,7 @@ export default function AdminDashboard() {
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!session) {
-          router.push('/auth/login');
+          router.push('/admin/login');
           return;
         }
 
@@ -26,15 +28,26 @@ export default function AdminDashboard() {
         // For now, we'll assume if they can access this, they're admin
         setUser(session.user);
         setIsAdmin(true);
+
+        // Check if onboarding should be shown
+        const onboardingShown = localStorage.getItem('admin_onboarding_shown');
+        if (onboardingShown !== 'true') {
+          setShowOnboarding(true);
+        }
+
         setLoading(false);
       } catch (error) {
         console.error('Admin check failed:', error);
-        router.push('/auth/login');
+        router.push('/admin/login');
       }
     };
 
     checkAdmin();
   }, [router, supabase.auth]);
+
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+  };
 
   if (loading) {
     return (
@@ -113,6 +126,10 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      {showOnboarding && (
+        <AdminOnboardingFlow onComplete={handleOnboardingComplete} />
+      )}
+
       {/* Header */}
       <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

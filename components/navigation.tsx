@@ -112,15 +112,15 @@ export function Navigation() {
                 </Link>
               )}
 
-              {/* Mobile Menu Button - Now Visible */}
+              {/* Mobile Menu Button - Black Background */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden flex flex-col justify-center gap-1.5 p-2 hover:bg-accent/10 rounded-lg transition-all"
+                className="lg:hidden flex flex-col justify-center gap-1.5 p-2 bg-black rounded-lg hover:bg-black/80 transition-all"
                 title="Menu"
               >
-                <span className={`w-6 h-0.5 bg-primary transition-all duration-300 ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
-                <span className={`w-6 h-0.5 bg-primary transition-all duration-300 ${mobileMenuOpen ? 'opacity-0' : ''}`} />
-                <span className={`w-6 h-0.5 bg-primary transition-all duration-300 ${mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+                <span className={`w-6 h-0.5 bg-white transition-all duration-300 ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
+                <span className={`w-6 h-0.5 bg-white transition-all duration-300 ${mobileMenuOpen ? 'opacity-0' : ''}`} />
+                <span className={`w-6 h-0.5 bg-white transition-all duration-300 ${mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
               </button>
             </div>
           </div>
@@ -188,13 +188,22 @@ export function Navigation() {
                 </button>
               </>
             ) : (
-              <Link
-                href="/auth/login"
-                className="block px-4 py-3 rounded-lg bg-accent/20 text-accent font-bold text-center text-sm hover:bg-accent/30 transition transform hover:scale-105 active:scale-95"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Sign In
-              </Link>
+              <>
+                <Link
+                  href="/auth/login"
+                  className="block px-4 py-3 rounded-lg bg-accent/20 text-accent font-bold text-center text-sm hover:bg-accent/30 transition transform hover:scale-105 active:scale-95"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Student Login
+                </Link>
+                <Link
+                  href="/admin/login"
+                  className="block px-4 py-3 rounded-lg bg-black text-white font-bold text-center text-sm hover:bg-black/80 transition transform hover:scale-105 active:scale-95"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Admin Login
+                </Link>
+              </>
             )}
           </div>
         </div>
