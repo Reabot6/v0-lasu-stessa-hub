@@ -168,7 +168,7 @@ export function Navigation() {
           </div>
 
           {/* Divider */}
-          <div className="border-t border-border" />
+          <div className="border-t border-slate-700" />
 
           {/* Admin Section */}
           <div className="space-y-3">

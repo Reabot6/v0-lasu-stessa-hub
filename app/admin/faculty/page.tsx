@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
 export default function AdminFacultyPage() {
@@ -59,32 +59,106 @@ export default function AdminFacultyPage() {
     setLoading(true);
 
     try {
-      // For now, just show success - in real app, save to Supabase
-      console.log('Faculty data:', formData);
-      console.log('Image:', imageFile);
-      
-      // Reset form
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        specialization: '',
-        office_location: '',
-        office_hours: '',
-        bio: '',
-      });
-      setImageFile(null);
-      setPreviewImage(null);
-      setShowForm(false);
-      
-      alert('Faculty member added successfully!');
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        alert('You must be logged in to add faculty');
+        setLoading(false);
+        return;
+      }
+
+      let imageUrl = null;
+
+      // Upload image if provided
+      if (imageFile) {
+        const fileName = `faculty-${Date.now()}-${imageFile.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from('uploads')
+          .upload(`faculty/${fileName}`, imageFile);
+
+        if (uploadError) {
+          console.error('Image upload error:', uploadError);
+          alert('Failed to upload image');
+          setLoading(false);
+          return;
+        }
+
+        // Get public URL
+        const { data } = supabase.storage
+          .from('uploads')
+          .getPublicUrl(`faculty/${fileName}`);
+        imageUrl = data.publicUrl;
+      }
+
+      // Insert faculty record into database
+      const { error: insertError } = await supabase
+        .from('faculty')
+        .insert([
+          {
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            specialization: formData.specialization,
+            office_location: formData.office_location,
+            office_hours: formData.office_hours,
+            bio: formData.bio,
+            image_url: imageUrl,
+            created_by: user.id,
+          },
+        ]);
+
+      if (insertError) {
+        console.error('Insert error:', insertError);
+        alert('Failed to add faculty member: ' + insertError.message);
+      } else {
+        alert('Faculty member added successfully!');
+        
+        // Reset form
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          specialization: '',
+          office_location: '',
+          office_hours: '',
+          bio: '',
+        });
+        setImageFile(null);
+        setPreviewImage(null);
+        setShowForm(false);
+
+        // Refresh faculty list
+        fetchFaculty();
+      }
     } catch (error) {
       console.error('Error adding faculty:', error);
-      alert('Failed to add faculty member');
+      alert('An unexpected error occurred');
     } finally {
       setLoading(false);
     }
   };
+
+  const fetchFaculty = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('faculty')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Fetch error:', error);
+      } else {
+        setFaculty(data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching faculty:', error);
+    }
+  };
+
+  // Fetch faculty on component mount
+  useEffect(() => {
+    fetchFaculty();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">

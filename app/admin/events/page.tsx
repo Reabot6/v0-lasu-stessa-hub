@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
 export default function AdminEventsPage() {
@@ -59,30 +59,108 @@ export default function AdminEventsPage() {
     setLoading(true);
 
     try {
-      console.log('Event data:', formData);
-      console.log('Media:', mediaFile);
-      
-      setFormData({
-        title: '',
-        description: '',
-        event_date: '',
-        event_time: '',
-        location: '',
-        event_type: 'seminar',
-        capacity: '',
-      });
-      setMediaFile(null);
-      setPreviewImage(null);
-      setShowForm(false);
-      
-      alert('Event created successfully!');
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        alert('You must be logged in to create events');
+        setLoading(false);
+        return;
+      }
+
+      let mediaUrl = null;
+
+      // Upload media if provided
+      if (mediaFile) {
+        const fileName = `event-${Date.now()}-${mediaFile.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from('uploads')
+          .upload(`events/${fileName}`, mediaFile);
+
+        if (uploadError) {
+          console.error('Media upload error:', uploadError);
+          alert('Failed to upload media');
+          setLoading(false);
+          return;
+        }
+
+        const { data } = supabase.storage
+          .from('uploads')
+          .getPublicUrl(`events/${fileName}`);
+        mediaUrl = data.publicUrl;
+      }
+
+      // Combine date and time
+      const eventDateTime = formData.event_time 
+        ? `${formData.event_date}T${formData.event_time}`
+        : `${formData.event_date}T00:00`;
+
+      // Insert event into database
+      const { error: insertError } = await supabase
+        .from('events')
+        .insert([
+          {
+            title: formData.title,
+            description: formData.description,
+            event_date: eventDateTime,
+            location: formData.location,
+            event_type: formData.event_type,
+            capacity: formData.capacity ? parseInt(formData.capacity) : null,
+            image_url: mediaUrl,
+            created_by: user.id,
+          },
+        ]);
+
+      if (insertError) {
+        console.error('Insert error:', insertError);
+        alert('Failed to create event: ' + insertError.message);
+      } else {
+        alert('Event created successfully!');
+        
+        setFormData({
+          title: '',
+          description: '',
+          event_date: '',
+          event_time: '',
+          location: '',
+          event_type: 'seminar',
+          capacity: '',
+        });
+        setMediaFile(null);
+        setPreviewImage(null);
+        setShowForm(false);
+
+        // Refresh events list
+        fetchEvents();
+      }
     } catch (error) {
       console.error('Error creating event:', error);
-      alert('Failed to create event');
+      alert('An unexpected error occurred');
     } finally {
       setLoading(false);
     }
   };
+
+  const fetchEvents = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .order('event_date', { ascending: false });
+
+      if (error) {
+        console.error('Fetch error:', error);
+      } else {
+        setEvents(data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    }
+  };
+
+  // Fetch events on component mount
+  useEffect(() => {
+    fetchEvents();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
