@@ -30,14 +30,6 @@ export default function Home() {
           return;
         }
 
-        // Check if user is an admin
-        const { data: adminSession } = await supabase.auth.getSession();
-        if (adminSession?.user?.user_metadata?.role === 'admin') {
-          // Admin should stay on admin dashboard
-          router.push('/admin/dashboard');
-          return;
-        }
-
         setIsAuthenticated(true);
         initializeStorage();
 
