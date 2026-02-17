@@ -4,23 +4,34 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { isAdminLoggedIn, clearAdminSession } from '@/lib/storage';
 import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import type { User } from '@supabase/supabase-js';
 
 export function Navigation() {
   const pathname = usePathname();
   const router = useRouter();
-  const [isAdmin, setIsAdmin] = useState(false);
+  const supabase = createClient();
+  const [user, setUser] = useState<User | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    setIsAdmin(isAdminLoggedIn());
-  }, []);
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    checkUser();
 
-  const handleLogout = () => {
-    clearAdminSession();
-    setIsAdmin(false);
-    router.push('/');
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription?.unsubscribe();
+  }, [supabase.auth]);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/auth/login');
   };
 
   const isActive = (path: string) => {
@@ -80,24 +91,21 @@ export function Navigation() {
 
             {/* Right: Auth Button */}
             <div className="flex items-center gap-3 sm:gap-4">
-              {isAdmin ? (
+              {user ? (
                 <div className="flex items-center gap-2">
-                  <Link
-                    href="/admin"
-                    className="hidden sm:block px-4 py-2 rounded-lg bg-secondary text-white font-medium text-sm hover:bg-secondary/90 transition"
-                  >
-                    Panel
-                  </Link>
+                  <span className="hidden sm:block px-4 py-2 rounded-lg bg-accent/10 text-primary font-medium text-sm">
+                    {user.email?.split('@')[0]}
+                  </span>
                   <button
                     onClick={handleLogout}
-                    className="px-4 py-2 rounded-lg bg-destructive text-white font-medium text-sm hover:bg-destructive/90 transition"
+                    className="px-4 py-2 rounded-lg bg-destructive text-white font-medium text-sm hover:bg-destructive/90 transition transform hover:scale-105 active:scale-95"
                   >
                     Logout
                   </button>
                 </div>
               ) : (
-                <Link href="/admin/login" className="px-4 py-2 rounded-lg bg-accent text-accent-foreground font-medium text-sm hover:bg-accent/90 transition">
-                  Admin
+                <Link href="/auth/login" className="px-4 py-2 rounded-lg bg-accent text-accent-foreground font-medium text-sm hover:bg-accent/90 transition transform hover:scale-105 active:scale-95">
+                  Sign In
                 </Link>
               )}
 
@@ -161,32 +169,28 @@ export function Navigation() {
 
           {/* Admin Section */}
           <div className="space-y-3">
-            {isAdmin ? (
+            {user ? (
               <>
-                <Link
-                  href="/admin"
-                  className="block px-4 py-3 rounded-lg bg-secondary/20 text-secondary font-bold text-center text-sm hover:bg-secondary/30 transition"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Admin Panel
-                </Link>
+                <div className="px-4 py-3 rounded-lg bg-accent/20 text-primary font-bold text-center text-sm">
+                  {user.email}
+                </div>
                 <button
                   onClick={() => {
                     handleLogout();
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full px-4 py-3 rounded-lg bg-destructive/20 text-destructive font-bold text-sm hover:bg-destructive/30 transition"
+                  className="w-full px-4 py-3 rounded-lg bg-destructive/20 text-destructive font-bold text-sm hover:bg-destructive/30 transition transform hover:scale-105 active:scale-95"
                 >
                   Logout
                 </button>
               </>
             ) : (
               <Link
-                href="/admin/login"
-                className="block px-4 py-3 rounded-lg bg-accent text-accent-foreground font-bold text-center text-sm hover:bg-accent/90 transition"
+                href="/auth/login"
+                className="block px-4 py-3 rounded-lg bg-accent/20 text-accent font-bold text-center text-sm hover:bg-accent/30 transition transform hover:scale-105 active:scale-95"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Admin Login
+                Sign In
               </Link>
             )}
           </div>
