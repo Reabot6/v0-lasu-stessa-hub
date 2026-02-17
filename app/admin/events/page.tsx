@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { AdminHeader } from '@/components/admin-header';
 
 export default function AdminEventsPage() {
   const supabase = createClient();
@@ -10,6 +11,7 @@ export default function AdminEventsPage() {
   const [showForm, setShowForm] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
     title: '',
@@ -94,43 +96,55 @@ export default function AdminEventsPage() {
         ? `${formData.event_date}T${formData.event_time}`
         : `${formData.event_date}T00:00`;
 
-      // Insert event into database
-      const { error: insertError } = await supabase
-        .from('events')
-        .insert([
-          {
+      // Update or Insert
+      if (editingId) {
+        const { error: updateError } = await supabase
+          .from('events')
+          .update({
             title: formData.title,
             description: formData.description,
             event_date: eventDateTime,
             location: formData.location,
             event_type: formData.event_type,
             capacity: formData.capacity ? parseInt(formData.capacity) : null,
-            image_url: mediaUrl,
-            created_by: user.id,
-          },
-        ]);
+            image_url: mediaUrl || previewImage,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', editingId);
 
-      if (insertError) {
-        console.error('Insert error:', insertError);
-        alert('Failed to create event: ' + insertError.message);
+        if (updateError) {
+          console.error('Update error:', updateError);
+          alert('Failed to update event: ' + updateError.message);
+        } else {
+          alert('Event updated successfully!');
+          handleCancelEdit();
+          fetchEvents();
+        }
       } else {
-        alert('Event created successfully!');
-        
-        setFormData({
-          title: '',
-          description: '',
-          event_date: '',
-          event_time: '',
-          location: '',
-          event_type: 'seminar',
-          capacity: '',
-        });
-        setMediaFile(null);
-        setPreviewImage(null);
-        setShowForm(false);
+        // Insert event into database
+        const { error: insertError } = await supabase
+          .from('events')
+          .insert([
+            {
+              title: formData.title,
+              description: formData.description,
+              event_date: eventDateTime,
+              location: formData.location,
+              event_type: formData.event_type,
+              capacity: formData.capacity ? parseInt(formData.capacity) : null,
+              image_url: mediaUrl,
+              created_by: user.id,
+            },
+          ]);
 
-        // Refresh events list
-        fetchEvents();
+        if (insertError) {
+          console.error('Insert error:', insertError);
+          alert('Failed to create event: ' + insertError.message);
+        } else {
+          alert('Event created successfully!');
+          handleCancelEdit();
+          fetchEvents();
+        }
       }
     } catch (error) {
       console.error('Error creating event:', error);
@@ -138,6 +152,62 @@ export default function AdminEventsPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this event?')) return;
+    
+    try {
+      const { error } = await supabase
+        .from('events')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        alert('Failed to delete event');
+      } else {
+        alert('Event deleted successfully');
+        fetchEvents();
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      alert('Error deleting event');
+    }
+  };
+
+  const handleEdit = (event: any) => {
+    setEditingId(event.id);
+    const eventDateTime = event.event_date ? new Date(event.event_date) : new Date();
+    setFormData({
+      title: event.title,
+      description: event.description || '',
+      event_date: eventDateTime.toISOString().split('T')[0],
+      event_time: eventDateTime.toTimeString().split(' ')[0].slice(0, 5),
+      location: event.location || '',
+      event_type: event.event_type || 'seminar',
+      capacity: event.capacity ? event.capacity.toString() : '',
+    });
+    if (event.image_url) {
+      setPreviewImage(event.image_url);
+    }
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setFormData({
+      title: '',
+      description: '',
+      event_date: '',
+      event_time: '',
+      location: '',
+      event_type: 'seminar',
+      capacity: '',
+    });
+    setMediaFile(null);
+    setPreviewImage(null);
+    setShowForm(false);
   };
 
   const fetchEvents = async () => {
@@ -164,30 +234,25 @@ export default function AdminEventsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* Header */}
-      <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-white">Events Management</h1>
-              <p className="text-slate-400 mt-1">Create and manage school events and seminars</p>
-            </div>
-            <button
-              onClick={() => setShowForm(!showForm)}
-              className="px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105 active:scale-95"
-            >
-              + Create Event
-            </button>
-          </div>
-        </div>
-      </header>
+      <AdminHeader 
+        title="Events Management" 
+        description="Create and manage school events and seminars"
+      />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Create Event Form */}
-        {showForm && (
-          <div className="mb-8 bg-slate-800/50 border border-slate-700 rounded-xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-6">Create New Event</h2>
+        {/* Create Event Button */}
+        {!showForm && (
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="mb-8 px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105 active:scale-95"
+          >
+            + Create Event
+          </button>
+        )}
+            
+            <div className="mb-8 bg-slate-800/50 border border-slate-700 rounded-xl p-8">
+              <h2 className="text-2xl font-bold text-white mb-6">{editingId ? 'Edit Event' : 'Create New Event'}</h2>
             
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -296,10 +361,30 @@ export default function AdminEventsPage() {
                   />
                   
                   {previewImage ? (
-                    <div className="space-y-4">
-                      <img src={previewImage} alt="Preview" className="w-32 h-32 object-cover rounded-lg mx-auto" />
-                      <p className="text-slate-300">Click or drag to change media</p>
-                    </div>
+            <div className="space-y-4">
+              {events.map((event) => (
+                <div key={event.id} className="bg-slate-900 border border-slate-700 rounded-lg p-6 hover:border-slate-600 transition flex justify-between items-start">
+                  <div>
+                    <h3 className="text-lg font-bold text-white">{event.title}</h3>
+                    <p className="text-slate-400 text-sm">{event.event_date}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => handleEdit(event)}
+                      className="px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded transition"
+                    >
+                      Edit
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(event.id)}
+                      className="px-3 py-1 text-sm bg-red-600 hover:bg-red-700 text-white rounded transition"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
                   ) : (
                     <label htmlFor="media-upload" className="cursor-pointer">
                       <div className="text-4xl mb-2">🎬</div>
@@ -317,61 +402,16 @@ export default function AdminEventsPage() {
                   disabled={loading}
                   className="flex-1 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50"
                 >
-                  {loading ? 'Creating...' : 'Create Event'}
+                  {loading ? (editingId ? 'Updating...' : 'Creating...') : (editingId ? 'Update Event' : 'Create Event')}
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowForm(false);
-                    setFormData({
-                      title: '',
-                      description: '',
-                      event_date: '',
-                      event_time: '',
-                      location: '',
-                      event_type: 'seminar',
-                      capacity: '',
-                    });
-                    setMediaFile(null);
-                    setPreviewImage(null);
-                  }}
+                  onClick={handleCancelEdit}
                   className="px-6 py-3 bg-slate-700 text-white rounded-lg font-semibold hover:bg-slate-600 transition"
                 >
                   Cancel
                 </button>
               </div>
             </form>
-          </div>
-        )}
-
-        {/* Events List */}
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-8">
-          <h2 className="text-2xl font-bold text-white mb-6">Events</h2>
-          
-          {events.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-4xl mb-4">📅</div>
-              <p className="text-slate-400 text-lg">No events created yet</p>
-              <p className="text-slate-500">Click "Create Event" to get started</p>
             </div>
-          ) : (
-            <div className="space-y-4">
-              {events.map((event, idx) => (
-                <div key={idx} className="bg-slate-900 border border-slate-700 rounded-lg p-6 hover:border-slate-600 transition flex justify-between items-start">
-                  <div>
-                    <h3 className="text-lg font-bold text-white">{event.title}</h3>
-                    <p className="text-slate-400 text-sm">{event.event_date}</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <button className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition">Edit</button>
-                    <button className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition">Delete</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </main>
-    </div>
-  );
-}
+        )
