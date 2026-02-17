@@ -91,7 +91,7 @@ export function FileUpload({ courseId, onUploadSuccess, onUploadError }: FileUpl
         className={`border-2 border-dashed rounded-lg p-6 text-center transition-all cursor-pointer ${
           isDragging
             ? 'border-primary bg-primary/10'
-            : 'border-border hover:border-primary/50 hover:bg-muted/50'
+            : 'border-slate-700 hover:border-primary/50 hover:bg-muted/50'
         } ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
         <div className="space-y-3">

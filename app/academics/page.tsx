@@ -59,7 +59,7 @@ export default function AcademicsPage() {
               placeholder="Search courses by title, code, or description..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-3 border border-border rounded-lg bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full px-4 py-3 border border-slate-700 rounded-lg bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
 

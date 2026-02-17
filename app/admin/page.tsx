@@ -286,7 +286,7 @@ export default function AdminPage() {
       <section className="py-12 bg-background">
         <div className="max-w-6xl mx-auto px-4">
           {/* Tabs */}
-          <div className="flex gap-4 mb-8 border-b border-border">
+          <div className="flex gap-4 mb-8 border-b border-slate-700">
             <button
               onClick={() => setActiveTab('courses')}
               className={`px-4 py-3 font-semibold border-b-2 transition ${activeTab === 'courses'
@@ -320,7 +320,7 @@ export default function AdminPage() {
           {activeTab === 'courses' && (
             <div className="space-y-6">
               {/* Form */}
-              <div className="bg-card border border-border rounded-lg p-6">
+              <div className="bg-card border border-slate-700 rounded-lg p-6">
                 <h2 className="text-2xl font-bold mb-4">
                   {editingId ? 'Edit Course' : 'Add New Course'}
                 </h2>
@@ -330,28 +330,28 @@ export default function AdminPage() {
                     placeholder="Course Title"
                     value={courseForm.title || ''}
                     onChange={(e) => setCourseForm({ ...courseForm, title: e.target.value })}
-                    className="px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="px-4 py-2 border border-slate-700 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                   <input
                     type="text"
                     placeholder="Course Code"
                     value={courseForm.code || ''}
                     onChange={(e) => setCourseForm({ ...courseForm, code: e.target.value })}
-                    className="px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="px-4 py-2 border border-slate-700 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                   <input
                     type="text"
                     placeholder="Department"
                     value={courseForm.department || ''}
                     onChange={(e) => setCourseForm({ ...courseForm, department: e.target.value })}
-                    className="px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="px-4 py-2 border border-slate-700 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <textarea
                   placeholder="Description"
                   value={courseForm.description || ''}
                   onChange={(e) => setCourseForm({ ...courseForm, description: e.target.value })}
-                  className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary mb-4"
+                  className="w-full px-4 py-2 border border-slate-700 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary mb-4"
                   rows={3}
                 />
                 <div className="flex gap-3">
@@ -379,7 +379,7 @@ export default function AdminPage() {
                 {courses.map((course) => (
                   <div
                     key={course.id}
-                    className="bg-card border border-border rounded-lg p-4 flex justify-between items-start"
+                    className="bg-card border border-slate-700 rounded-lg p-4 flex justify-between items-start"
                   >
                     <div className="flex-1">
                       <h3 className="font-bold text-primary">{course.code}</h3>
@@ -413,7 +413,7 @@ export default function AdminPage() {
           {activeTab === 'resources' && (
             <div className="space-y-6">
               {/* Form */}
-              <div className="bg-card border border-border rounded-lg p-6">
+              <div className="bg-card border border-slate-700 rounded-lg p-6">
                 <h2 className="text-2xl font-bold mb-4">
                   {editingId ? 'Edit Resource' : 'Add New Resource'}
                 </h2>
@@ -423,12 +423,12 @@ export default function AdminPage() {
                     placeholder="Resource Title"
                     value={resourceForm.title || ''}
                     onChange={(e) => setResourceForm({ ...resourceForm, title: e.target.value })}
-                    className="px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="px-4 py-2 border border-slate-700 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                   <select
                     value={resourceForm.course_id || ''}
                     onChange={(e) => setResourceForm({ ...resourceForm, course_id: e.target.value })}
-                    className="px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="px-4 py-2 border border-slate-700 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     <option value="">Select Course</option>
                     {courses.map((course) => (
@@ -440,7 +440,7 @@ export default function AdminPage() {
                   <select
                     value={resourceForm.type || ''}
                     onChange={(e) => setResourceForm({ ...resourceForm, type: e.target.value })}
-                    className="px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="px-4 py-2 border border-slate-700 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     <option value="">Select Type</option>
                     <option value="pdf">PDF</option>
@@ -457,7 +457,7 @@ export default function AdminPage() {
                     placeholder="URL or upload file below"
                     value={resourceForm.url || ''}
                     onChange={(e) => setResourceForm({ ...resourceForm, url: e.target.value })}
-                    className="px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="px-4 py-2 border border-slate-700 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
 
@@ -496,7 +496,7 @@ export default function AdminPage() {
                   placeholder="Description"
                   value={resourceForm.description || ''}
                   onChange={(e) => setResourceForm({ ...resourceForm, description: e.target.value })}
-                  className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary mb-4"
+                  className="w-full px-4 py-2 border border-slate-700 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary mb-4"
                   rows={3}
                 />
                 <div className="flex gap-3">
@@ -526,7 +526,7 @@ export default function AdminPage() {
                   return (
                     <div
                       key={resource.id}
-                      className="bg-card border border-border rounded-lg p-4 flex justify-between items-start"
+                      className="bg-card border border-slate-700 rounded-lg p-4 flex justify-between items-start"
                     >
                       <div className="flex-1">
                         <p className="font-bold text-primary">{resource.title}</p>
@@ -568,7 +568,7 @@ export default function AdminPage() {
           {activeTab === 'news' && (
             <div className="space-y-6">
               {/* Form */}
-              <div className="bg-card border border-border rounded-lg p-6">
+              <div className="bg-card border border-slate-700 rounded-lg p-6">
                 <h2 className="text-2xl font-bold mb-4">
                   {editingId ? 'Edit News' : 'Add New News'}
                 </h2>
@@ -578,20 +578,20 @@ export default function AdminPage() {
                     placeholder="News Title"
                     value={newsForm.title || ''}
                     onChange={(e) => setNewsForm({ ...newsForm, title: e.target.value })}
-                    className="px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="px-4 py-2 border border-slate-700 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                   <input
                     type="date"
                     value={newsForm.date || new Date().toISOString().split('T')[0]}
                     onChange={(e) => setNewsForm({ ...newsForm, date: e.target.value })}
-                    className="px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="px-4 py-2 border border-slate-700 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <textarea
                   placeholder="News Content"
                   value={newsForm.content || ''}
                   onChange={(e) => setNewsForm({ ...newsForm, content: e.target.value })}
-                  className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary mb-4"
+                  className="w-full px-4 py-2 border border-slate-700 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary mb-4"
                   rows={6}
                 />
                 <div className="flex gap-3">
@@ -619,7 +619,7 @@ export default function AdminPage() {
                 {news.map((newsItem) => (
                   <div
                     key={newsItem.id}
-                    className="bg-card border border-border rounded-lg p-4 flex justify-between items-start"
+                    className="bg-card border border-slate-700 rounded-lg p-4 flex justify-between items-start"
                   >
                     <div className="flex-1">
                       <p className="font-bold text-primary">{newsItem.title}</p>
