@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 interface AdminHeaderProps {
   title: string;
@@ -11,6 +12,15 @@ interface AdminHeaderProps {
 
 export function AdminHeader({ title, description, breadcrumbs }: AdminHeaderProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const supabase = createClient();
+
+  const handleLogout = async () => {
+    if (confirm('Are you sure you want to logout?')) {
+      await supabase.auth.signOut();
+      router.push('/admin/login');
+    }
+  };
 
   const getBreadcrumbs = () => {
     if (breadcrumbs) return breadcrumbs;
@@ -32,6 +42,17 @@ export function AdminHeader({ title, description, breadcrumbs }: AdminHeaderProp
   return (
     <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Header Top with Logout Button */}
+        <div className="flex items-center justify-between mb-6">
+          <div />
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 rounded-lg bg-destructive text-white font-medium text-sm hover:bg-destructive/90 transition transform hover:scale-105 active:scale-95"
+          >
+            Logout
+          </button>
+        </div>
+
         {/* Text Breadcrumbs Only - No Buttons */}
         <div className="flex items-center gap-2 mb-4 text-sm">
           <Link
