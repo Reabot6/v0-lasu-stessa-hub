@@ -104,11 +104,10 @@ export default function DashboardPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-6 py-3 font-bold whitespace-nowrap transition-all duration-300 border-b-4 ${
-                  activeTab === tab.id
+                className={`px-6 py-3 font-bold whitespace-nowrap transition-all duration-300 border-b-4 ${activeTab === tab.id
                     ? 'border-accent text-accent bg-accent/10'
                     : 'border-transparent text-foreground/60 hover:text-accent'
-                }`}
+                  }`}
               >
                 <span className="mr-2">{tab.icon}</span>
                 {tab.label}
@@ -234,11 +233,6 @@ export default function DashboardPage() {
                       {user?.email?.split('@')[0]}
                     </h3>
                     <p className="text-foreground/70 mb-4">{user?.email}</p>
-                    <div className="pt-4 border-t border-accent/20">
-                      <button className="w-full py-2 px-4 rounded-lg bg-accent text-accent-foreground font-bold hover:bg-accent/90 transition-all">
-                        Edit Profile
-                      </button>
-                    </div>
                   </div>
                 </div>
 

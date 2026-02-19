@@ -30,10 +30,10 @@ export function CyberFooter() {
           <div className="space-y-3">
             <h4 className="text-[#00f5ff] font-bold uppercase tracking-wider text-sm">Quick Access</h4>
             <ul className="space-y-2">
-              <li><Link href="/academics" className="text-[#a0a6b8] hover:text-[#00f5ff] transition-colors text-sm">Academics</Link></li>
-              <li><Link href="/resources" className="text-[#a0a6b8] hover:text-[#00f5ff] transition-colors text-sm">Resources</Link></li>
-              <li><Link href="/news" className="text-[#a0a6b8] hover:text-[#00f5ff] transition-colors text-sm">News</Link></li>
-              <li><Link href="/admin" className="text-[#a0a6b8] hover:text-[#00f5ff] transition-colors text-sm">Admin</Link></li>
+              <li><Link href="#" className="text-[#a0a6b8] hover:text-[#00f5ff] transition-colors text-sm">Academics</Link></li>
+              <li><Link href="#" className="text-[#a0a6b8] hover:text-[#00f5ff] transition-colors text-sm">Resources</Link></li>
+              <li><Link href="#" className="text-[#a0a6b8] hover:text-[#00f5ff] transition-colors text-sm">News</Link></li>
+              <li><Link href="#" className="text-[#a0a6b8] hover:text-[#00f5ff] transition-colors text-sm">Admin</Link></li>
             </ul>
           </div>
 
@@ -96,7 +96,7 @@ export function CyberFooter() {
 
         {/* Bottom Bar */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-[#a0a6b8] text-sm">
-          <p>© 2024 LASU STESA. All rights reserved. We are LASU We are Great.</p>
+          <p>© 2026 LASU STE. All rights reserved. We are LASU We are Great.</p>
           <div className="flex gap-4">
             <a href="#" className="hover:text-[#00f5ff] transition-colors">Privacy</a>
             <a href="#" className="hover:text-[#00f5ff] transition-colors">Terms</a>
