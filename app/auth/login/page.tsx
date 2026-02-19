@@ -21,14 +21,10 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const options = rememberMe ? {
-        data: { rememberMe: true, expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) }
-      } : {};
-
       const { data, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
-      }, options);
+      });
 
       if (authError) {
         setError(authError.message);
