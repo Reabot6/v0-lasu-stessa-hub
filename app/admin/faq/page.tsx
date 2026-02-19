@@ -81,14 +81,14 @@ export default function AdminFAQPage() {
         if (error) alert('Failed to update FAQ: ' + error.message);
         else alert('FAQ updated successfully!');
       } else {
-        const { error } = await supabase.from('faqs').insert([{
+        const { error } = await supabase.from('faqs').insert({
           question: formData.question,
           answer: formData.answer,
           category: formData.category || null,
           display_order: formData.display_order,
           attachment_url: fileUrl,
           created_by: user.id,
-        }]);
+        });
         if (error) alert('Failed to create FAQ: ' + error.message);
         else alert('FAQ created successfully!');
       }

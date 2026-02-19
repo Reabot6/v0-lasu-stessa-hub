@@ -87,14 +87,14 @@ export default function AdminNewsPage() {
         if (error) alert('Failed to update news: ' + error.message);
         else alert('News updated successfully!');
       } else {
-        const { error } = await supabase.from('news').insert([{
+        const { error } = await supabase.from('news').insert({
           title: formData.title,
           content: formData.content,
           author: formData.author,
           published: formData.published,
           image_url: imageUrl,
           created_by: user.id,
-        }]);
+        });
         if (error) alert('Failed to create news: ' + error.message);
         else alert('News created successfully!');
       }

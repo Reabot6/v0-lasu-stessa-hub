@@ -81,14 +81,14 @@ export default function AdminResourcesPage() {
         if (error) alert('Failed to update resource: ' + error.message);
         else alert('Resource updated successfully!');
       } else {
-        const { error } = await supabase.from('resources').insert([{
+        const { error } = await supabase.from('resources').insert({
           title: formData.title,
           description: formData.description,
           course_id: formData.course_id || null,
           resource_type: formData.resource_type,
           file_url: fileUrl,
           created_by: user.id,
-        }]);
+        });
         if (error) alert('Failed to create resource: ' + error.message);
         else alert('Resource created successfully!');
       }

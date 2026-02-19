@@ -183,18 +183,16 @@ export default function AdminEventsPage() {
         // Insert event into database
         const { error: insertError } = await supabase
           .from('events')
-          .insert([
-            {
-              title: formData.title,
-              description: formData.description,
-              event_date: eventDateTime,
-              location: formData.location,
-              event_type: formData.event_type,
-              capacity: formData.capacity ? parseInt(formData.capacity) : null,
-              image_url: mediaUrl,
-              created_by: user.id,
-            },
-          ]);
+          .insert({
+            title: formData.title,
+            description: formData.description,
+            event_date: eventDateTime,
+            location: formData.location,
+            event_type: formData.event_type,
+            capacity: formData.capacity ? parseInt(formData.capacity) : null,
+            image_url: mediaUrl,
+            created_by: user.id,
+          });
 
         if (insertError) {
           console.error('Insert error:', insertError);
