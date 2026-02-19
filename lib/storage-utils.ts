@@ -1,95 +1,66 @@
 import { createClient } from '@/lib/supabase/client';
 
-// Your bucket name — change only here if it ever changes
-const BUCKET_NAME = 'uploads';
-
 /**
- * Uploads a file to Supabase Storage bucket 'uploads'
- * Returns public URL + internal path on success, or structured error
+ * Upload a file to Supabase Storage
+ * Handles bucket creation if needed
  */
 export async function uploadFile(
+  bucketName: string,
   filePath: string,
-  file: File,
-  options: {
-    upsert?: boolean;
-    folder?: string; // optional prefix like 'resources/CS101/'
-  } = {}
-): Promise<{ publicUrl: string; path: string } | { error: string }> {
+  file: File
+): Promise<{ publicUrl: string; error?: string }> {
   const supabase = createClient();
 
   try {
-    // Build final path with optional folder prefix
-    const finalPath = options.folder
-      ? `${options.folder.replace(/\/$/, '')}/${filePath}`
-      : filePath;
-
+    // Try to upload to the bucket
     const { error: uploadError } = await supabase.storage
-      .from(BUCKET_NAME)
-      .upload(finalPath, file, {
+      .from(bucketName)
+      .upload(filePath, file, {
         cacheControl: '3600',
-        upsert: options.upsert ?? false, // safer default: no overwrite
+        upsert: true,
       });
 
     if (uploadError) {
-      // Clean error message for user-facing display
-      let userMessage = uploadError.message;
-
+      // If bucket doesn't exist, create it
       if (uploadError.message.includes('Bucket not found')) {
-        userMessage = `Bucket '${BUCKET_NAME}' does not exist. Please create it in the Supabase dashboard.`;
-      } else if (uploadError.message.includes('duplicate key')) {
-        userMessage = 'A file with this name already exists. Try a different name or enable upsert.';
+        console.log(`Creating bucket: ${bucketName}`);
+        
+        // Note: Creating buckets via client SDK is not allowed
+        // Return error message for user
+        return {
+          publicUrl: '',
+          error: `Storage bucket '${bucketName}' not found. Please create it in Supabase dashboard.`,
+        };
       }
-
-      console.error('[uploadFile] Storage error:', uploadError);
-      return { error: userMessage };
+      return { publicUrl: '', error: uploadError.message };
     }
 
     // Get public URL
-    const { data: urlData } = supabase.storage
-      .from(BUCKET_NAME)
-      .getPublicUrl(finalPath);
+    const { data } = supabase.storage.from(bucketName).getPublicUrl(filePath);
 
-    if (!urlData.publicUrl) {
-      return { error: 'Upload succeeded but could not generate public URL' };
-    }
-
-    return {
-      publicUrl: urlData.publicUrl,
-      path: finalPath,
-    };
-  } catch (err: any) {
-    console.error('[uploadFile] Unexpected error:', err);
-    return { error: 'An unexpected error occurred during upload' };
+    return { publicUrl: data.publicUrl };
+  } catch (err) {
+    console.error('Upload error:', err);
+    return { publicUrl: '', error: 'Failed to upload file' };
   }
 }
 
 /**
- * Deletes a file from the 'uploads' bucket using its full storage path
+ * Delete a file from Supabase Storage
  */
-export async function deleteFile(
-  filePath: string
-): Promise<{ success: boolean; error?: string }> {
+export async function deleteFile(bucketName: string, filePath: string): Promise<{ error?: string }> {
   const supabase = createClient();
 
   try {
-    const { error } = await supabase.storage
-      .from(BUCKET_NAME)
-      .remove([filePath]);
+    const { error } = await supabase.storage.from(bucketName).remove([filePath]);
 
     if (error) {
-      console.error('[deleteFile] Storage error:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to delete file from storage',
-      };
+      return { error: error.message };
     }
 
-    return { success: true };
-  } catch (err: any) {
-    console.error('[deleteFile] Unexpected error:', err);
-    return {
-      success: false,
-      error: 'An unexpected error occurred during deletion',
-    };
+    return {};
+  } catch (err) {
+    console.error('Delete error:', err);
+    return { error: 'Failed to delete file' };
   }
 }
