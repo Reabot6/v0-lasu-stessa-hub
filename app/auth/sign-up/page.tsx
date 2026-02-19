@@ -107,7 +107,7 @@ export default function SignUpPage() {
               />
             </div>
             <h1 className="text-3xl font-bold text-primary mb-2">Create Account</h1>
-            <p className="text-foreground/60">Join LASU STESA and start your academic journey</p>
+            <p className="text-foreground/60">Join LASU STESA and start your academic journey check spam for confirmation link </p>
           </div>
 
           {/* Form */}
