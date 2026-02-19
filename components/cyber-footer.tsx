@@ -30,10 +30,10 @@ export function CyberFooter() {
           <div className="space-y-3">
             <h4 className="text-[#00f5ff] font-bold uppercase tracking-wider text-sm">Quick Access</h4>
             <ul className="space-y-2">
-              <li><Link href="/academics" className="text-[#a0a6b8] hover:text-[#00f5ff] transition-colors text-sm">Academics</Link></li>
-              <li><Link href="/resources" className="text-[#a0a6b8] hover:text-[#00f5ff] transition-colors text-sm">Resources</Link></li>
-              <li><Link href="/news" className="text-[#a0a6b8] hover:text-[#00f5ff] transition-colors text-sm">News</Link></li>
-              <li><Link href="/admin" className="text-[#a0a6b8] hover:text-[#00f5ff] transition-colors text-sm">Admin</Link></li>
+              <li><Link href="#" className="text-[#a0a6b8] hover:text-[#00f5ff] transition-colors text-sm">Academics</Link></li>
+              <li><Link href="#" className="text-[#a0a6b8] hover:text-[#00f5ff] transition-colors text-sm">Resources</Link></li>
+              <li><Link href="#" className="text-[#a0a6b8] hover:text-[#00f5ff] transition-colors text-sm">News</Link></li>
+              <li><Link href="#" className="text-[#a0a6b8] hover:text-[#00f5ff] transition-colors text-sm">Admin</Link></li>
             </ul>
           </div>
 
