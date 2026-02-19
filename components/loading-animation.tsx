@@ -68,7 +68,7 @@ export function LoadingAnimation() {
           animation: slide-right 0.8s ease-out;
         }
       `}</style>
-      
+
       <div className="text-center z-10 relative">
         {/* Animated Rolling Ball */}
         <div className="float-icon mb-12">
