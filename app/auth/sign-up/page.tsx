@@ -123,8 +123,8 @@ export default function SignUpPage() {
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="John Doe"
                 className={`w-full px-4 py-3 rounded-lg border-2 bg-white/50 text-foreground placeholder-foreground/40 transition-all duration-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent/30 hover:border-primary/40 ${validationErrors.fullName
-                    ? 'border-destructive focus:border-destructive'
-                    : 'border-primary/20 focus:border-accent'
+                  ? 'border-destructive focus:border-destructive'
+                  : 'border-primary/20 focus:border-accent'
                   }`}
               />
               {validationErrors.fullName && (
@@ -143,8 +143,8 @@ export default function SignUpPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 className={`w-full px-4 py-3 rounded-lg border-2 bg-white/50 text-foreground placeholder-foreground/40 transition-all duration-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent/30 hover:border-primary/40 ${validationErrors.email
-                    ? 'border-destructive focus:border-destructive'
-                    : 'border-primary/20 focus:border-accent'
+                  ? 'border-destructive focus:border-destructive'
+                  : 'border-primary/20 focus:border-accent'
                   }`}
               />
               {validationErrors.email && (
@@ -163,8 +163,8 @@ export default function SignUpPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 className={`w-full px-4 py-3 rounded-lg border-2 bg-white/50 text-foreground placeholder-foreground/40 transition-all duration-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent/30 hover:border-primary/40 ${validationErrors.password
-                    ? 'border-destructive focus:border-destructive'
-                    : 'border-primary/20 focus:border-accent'
+                  ? 'border-destructive focus:border-destructive'
+                  : 'border-primary/20 focus:border-accent'
                   }`}
               />
               {validationErrors.password && (
@@ -184,8 +184,8 @@ export default function SignUpPage() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
                 className={`w-full px-4 py-3 rounded-lg border-2 bg-white/50 text-foreground placeholder-foreground/40 transition-all duration-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent/30 hover:border-primary/40 ${validationErrors.confirmPassword
-                    ? 'border-destructive focus:border-destructive'
-                    : 'border-primary/20 focus:border-accent'
+                  ? 'border-destructive focus:border-destructive'
+                  : 'border-primary/20 focus:border-accent'
                   }`}
               />
               {validationErrors.confirmPassword && (
@@ -204,9 +204,9 @@ export default function SignUpPage() {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-3 rounded-lg font-bold text-white transition-all duration-300 transform hover:scale-105 active:scale-95 relative overflow-hidden group ${loading
-                  ? 'bg-accent/70 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-primary to-secondary hover:shadow-lg'
+              className={`w-full py-3 rounded-lg font-bold text-black transition-all duration-300 transform hover:scale-105 active:scale-95 relative overflow-hidden group ${loading
+                ? 'bg-accent/70 cursor-not-allowed'
+                : 'bg-gradient-to-r from-primary to-secondary hover:shadow-lg'
                 } animate-fade-in-up`}
               style={{ animationDelay: '0.25s' }}
             >
