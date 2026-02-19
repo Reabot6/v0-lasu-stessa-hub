@@ -48,6 +48,39 @@ export interface NewsItem {
 }
 
 // ──────────────────────────────────────────────
+// Simple fallback admin auth (localStorage + hardcoded check)
+// ──────────────────────────────────────────────
+
+export const verifyAdmin = async (
+  email: string,
+  password: string
+): Promise<boolean> => {
+  if (email === 'stessaedu@gmail.com' && password === 'admin123stessa') {
+    return true;
+  }
+  return false;
+};
+
+export const setAdminSession = (token: string): void => {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem('stessa_admin_session', token);
+};
+
+export const getAdminSession = (): string | null => {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('stessa_admin_session');
+};
+
+export const clearAdminSession = (): void => {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem('stessa_admin_session');
+};
+
+export const isAdminLoggedIn = (): boolean => {
+  return !!getAdminSession();
+};
+
+// ──────────────────────────────────────────────
 // Courses
 // ──────────────────────────────────────────────
 
@@ -118,7 +151,7 @@ export async function updateCourse(
 
 export async function deleteCourse(id: string): Promise<boolean> {
   try {
-    // Delete related resources first (due to ON DELETE CASCADE, but explicit is safer for logging)
+    // Delete related resources first
     const { error: resError } = await supabase.from('resources').delete().eq('course_id', id);
     if (resError) throw resError;
 
@@ -281,34 +314,4 @@ export async function deleteNews(id: string): Promise<boolean> {
   }
 
   return true;
-
 }
-
-export const verifyAdmin = async (
-  email: string,
-  password: string
-): Promise<boolean> => {
-  if (email === 'stessaedu@gmail.com' && password === 'admin123stessa') {
-    return true;
-  }
-  return false;
-};
-
-export const setAdminSession = (token: string): void => {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem('stessa_admin_session', token);
-};
-
-export const getAdminSession = (): string | null => {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('stessa_admin_session');
-};
-
-export const clearAdminSession = (): void => {
-  if (typeof window === 'undefined') return;
-  localStorage.removeItem('stessa_admin_session');
-};
-
-export const isAdminLoggedIn = (): boolean => {
-  return !!getAdminSession();
-};
