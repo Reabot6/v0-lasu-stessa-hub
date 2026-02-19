@@ -2,95 +2,99 @@
 
 export function LoadingAnimation() {
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-[#001F3F] via-[#0A1F3D] to-[#001F3F] flex items-center justify-center z-50 overflow-hidden">
+    <div className="fixed inset-0 bg-gradient-to-br from-primary via-secondary to-primary flex items-center justify-center z-50 overflow-hidden">
       <style>{`
-        @keyframes fadePulse {
-          0%, 100% { opacity: 0.4; }
-          50%   { opacity: 1; }
-        }
-        @keyframes gentleFloat {
-          0%, 100% { transform: translateY(0px); }
-          50%      { transform: translateY(-12px); }
-        }
-        @keyframes subtleRotate {
-          from { transform: rotate(0deg); }
-          to   { transform: rotate(360deg); }
-        }
-        @keyframes marquee {
-          0%   { transform: translateX(100%); }
+        @keyframes roll-text {
+          0% { transform: translateX(100%); }
           100% { transform: translateX(-100%); }
         }
-        @keyframes scaleFade {
-          0%   { opacity: 0; transform: scale(0.92); }
-          100% { opacity: 1; transform: scale(1); }
+        @keyframes bounce-3d {
+          0%, 100% { 
+            transform: translateY(0) scale(1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+          }
+          50% { 
+            transform: translateY(-80px) scale(1.1);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+          }
         }
-
-        .lasu-crest {
-          animation: gentleFloat 5s ease-in-out infinite, subtleRotate 24s linear infinite;
-          will-change: transform;
+        @keyframes rotate-360 {
+          0% { transform: rotateX(0) rotateY(0) rotateZ(0); }
+          100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
         }
-
-        .motto-marquee {
-          animation: marquee 18s linear infinite;
+        @keyframes pulse-glow {
+          0%, 100% { 
+            box-shadow: 0 0 20px rgba(212, 165, 116, 0.8), 
+                        inset 0 0 20px rgba(212, 165, 116, 0.4);
+          }
+          50% { 
+            box-shadow: 0 0 40px rgba(212, 165, 116, 1), 
+                        inset 0 0 30px rgba(212, 165, 116, 0.6);
+          }
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
+        }
+        @keyframes slide-left {
+          from { opacity: 0; transform: translateX(100px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slide-right {
+          from { opacity: 0; transform: translateX(-100px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        .rolling-ball {
+          animation: bounce-3d 1.2s ease-in-out infinite, 
+                     rotate-360 2s linear infinite,
+                     pulse-glow 2s ease-in-out infinite;
+        }
+        .roll-text {
+          animation: roll-text 4s linear infinite;
           white-space: nowrap;
+          font-size: 1.5rem;
+          font-weight: bold;
+          color: #d4a574;
+          text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+          letter-spacing: 0.1em;
         }
-
-        .fade-pulse {
-          animation: fadePulse 2.8s ease-in-out infinite;
+        .float-icon {
+          animation: float 3s ease-in-out infinite;
         }
-
-        .loading-text {
-          animation: scaleFade 1.2s ease-out forwards;
+        .slide-in-left {
+          animation: slide-left 0.8s ease-out;
+        }
+        .slide-in-right {
+          animation: slide-right 0.8s ease-out;
         }
       `}</style>
 
-      <div className="relative z-10 text-center max-w-md px-6">
-        {/* LASU Crest – centerpiece */}
-        <div className="mb-10 relative">
-          <div className="w-32 h-32 sm:w-40 sm:h-40 mx-auto relative lasu-crest">
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#D4AF37]/20 via-transparent to-[#001F3F]/30 blur-xl" />
-            <img
-              src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Lagos_State_University_logo.png"
-              alt="Lagos State University Crest"
-              className="w-full h-full object-contain drop-shadow-2xl"
-              loading="eager"
-            />
+      <div className="text-center z-10 relative">
+        {/* Animated Rolling Ball */}
+        <div className="float-icon mb-12">
+          <div className="rolling-ball w-28 h-28 rounded-full bg-gradient-to-br from-accent via-accent/80 to-accent/60 relative">
+            {/* Inner reflections for 3D effect */}
+            <div className="absolute top-6 left-8 w-8 h-8 bg-white/30 rounded-full blur-md" />
+            <div className="absolute bottom-8 right-6 w-6 h-6 bg-white/20 rounded-full blur-sm" />
           </div>
         </div>
 
-        {/* Scrolling motto – elegant & slower */}
-        <div className="overflow-hidden h-9 mb-10">
-          <div
-            className="motto-marquee text-[#D4AF37] text-xl sm:text-2xl font-bold tracking-wider"
-            style={{ textShadow: '0 2px 10px rgba(212,175,55,0.3)' }}
-          >
-            FOR TRUTH AND SERVICE  •  WE ARE LASU  •  WE ARE GREAT  •  SINCE 1983  • {' '}
-            FOR TRUTH AND SERVICE  •  WE ARE LASU  •  WE ARE GREAT  •  SINCE 1983  •
+        {/* Scrolling Motto */}
+        <div className="overflow-hidden w-full mb-8 h-10 flex items-center justify-center">
+          <div className="roll-text">WE ARE LASU WE ARE GREAT</div>
+        </div>
+
+        {/* Status Text with animations */}
+        <div className="space-y-3">
+          <p className="text-white/80 text-base font-medium slide-in-left">
+            Loading your education hub...
+          </p>
+          <div className="flex gap-1 justify-center">
+            <div className="w-2 h-2 bg-accent rounded-full animate-pulse" />
+            <div className="w-2 h-2 bg-accent rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
+            <div className="w-2 h-2 bg-accent rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
           </div>
         </div>
-
-        {/* Main loading message */}
-        <h2 className="text-white text-2xl sm:text-3xl font-semibold mb-4 loading-text">
-          Preparing your academic space...
-        </h2>
-
-        <p className="text-white/70 text-base sm:text-lg mb-8 max-w-sm mx-auto fade-pulse">
-          Department of Science and Technology Education<br />
-          Faculty of Education • Lagos State University
-        </p>
-
-        {/* Elegant progress indicators */}
-        <div className="flex items-center justify-center gap-3">
-          <div className="w-3 h-3 rounded-full bg-[#D4AF37]/70 animate-pulse" style={{ animationDelay: '0ms' }} />
-          <div className="w-3 h-3 rounded-full bg-[#D4AF37]/70 animate-pulse" style={{ animationDelay: '300ms' }} />
-          <div className="w-3 h-3 rounded-full bg-[#D4AF37]/70 animate-pulse" style={{ animationDelay: '600ms' }} />
-        </div>
-      </div>
-
-      {/* Very subtle background glow orb */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#D4AF37]/5 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '14s' }} />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#00A8A0]/5 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '18s', animationDelay: '4s' }} />
       </div>
     </div>
   );
