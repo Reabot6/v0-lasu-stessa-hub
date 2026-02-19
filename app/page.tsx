@@ -26,7 +26,24 @@ export default function Home() {
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!session) {
-          router.push('/auth/login');
+          // Check if remember me is still valid
+          const rememberMeExpiry = localStorage.getItem('rememberMeExpiry');
+          if (rememberMeExpiry && parseInt(rememberMeExpiry) > Date.now()) {
+            // Session might still be valid, let's check
+            const { data: { session: restoredSession } } = await supabase.auth.getSession();
+            if (!restoredSession) {
+              router.push('/auth/login');
+              return;
+            }
+          } else {
+            router.push('/auth/login');
+            return;
+          }
+        }
+
+        // Check if user is admin and redirect them
+        if (session?.user?.user_metadata?.role === 'admin') {
+          router.push('/admin/home');
           return;
         }
 
