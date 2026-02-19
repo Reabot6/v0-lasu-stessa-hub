@@ -96,7 +96,7 @@ export function CyberFooter() {
 
         {/* Bottom Bar */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-[#a0a6b8] text-sm">
-          <p>© 2024 LASU STESA. All rights reserved. We are LASU We are Great.</p>
+          <p>© 2026 LASU STE. All rights reserved. We are LASU We are Great.</p>
           <div className="flex gap-4">
             <a href="#" className="hover:text-[#00f5ff] transition-colors">Privacy</a>
             <a href="#" className="hover:text-[#00f5ff] transition-colors">Terms</a>
