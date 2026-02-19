@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import Image from 'next/image'; // Add this import for optimized image
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('');
@@ -66,7 +67,6 @@ export default function SignUpPage() {
       if (authError) {
         setError(authError.message);
       } else if (data.user) {
-        // Mark onboarding as not shown for this user
         if (typeof window !== 'undefined') {
           localStorage.setItem('onboarding_shown', 'false');
           localStorage.setItem('user_email', email);
@@ -92,14 +92,22 @@ export default function SignUpPage() {
 
       <div className="w-full max-w-md relative z-10">
         {/* Card Container */}
-        <div className={`p-8 sm:p-10 rounded-2xl backdrop-blur-sm border-2 bg-white/95 shadow-2xl transition-all duration-500 transform ${
-          success ? 'scale-95 opacity-0' : 'scale-100 opacity-100'
-        }`}>
+        <div className={`p-8 sm:p-10 rounded-2xl backdrop-blur-sm border-2 bg-white/95 shadow-2xl transition-all duration-500 transform ${success ? 'scale-95 opacity-0' : 'scale-100 opacity-100'
+          }`}>
           {/* Header */}
           <div className="mb-8 text-center animate-fade-in-up">
-            <div className="mb-4 text-5xl">✨</div>
+            {/* LASU Logo instead of ✨ */}
+            <div className="mb-6 mx-auto relative w-24 h-24 sm:w-28 sm:h-28">
+              <Image
+                src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Lagos_State_University_logo.png"
+                alt="Lagos State University Logo"
+                fill
+                className="object-contain drop-shadow-md"
+                priority
+              />
+            </div>
             <h1 className="text-3xl font-bold text-primary mb-2">Create Account</h1>
-            <p className="text-foreground/60">Join LASU STESA and start learning</p>
+            <p className="text-foreground/60">Join LASU STESA and start your academic journey</p>
           </div>
 
           {/* Form */}
@@ -114,11 +122,10 @@ export default function SignUpPage() {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="John Doe"
-                className={`w-full px-4 py-3 rounded-lg border-2 bg-white/50 text-foreground placeholder-foreground/40 transition-all duration-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent/30 hover:border-primary/40 ${
-                  validationErrors.fullName
+                className={`w-full px-4 py-3 rounded-lg border-2 bg-white/50 text-foreground placeholder-foreground/40 transition-all duration-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent/30 hover:border-primary/40 ${validationErrors.fullName
                     ? 'border-destructive focus:border-destructive'
                     : 'border-primary/20 focus:border-accent'
-                }`}
+                  }`}
               />
               {validationErrors.fullName && (
                 <p className="text-destructive text-xs mt-1">{validationErrors.fullName}</p>
@@ -135,11 +142,10 @@ export default function SignUpPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className={`w-full px-4 py-3 rounded-lg border-2 bg-white/50 text-foreground placeholder-foreground/40 transition-all duration-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent/30 hover:border-primary/40 ${
-                  validationErrors.email
+                className={`w-full px-4 py-3 rounded-lg border-2 bg-white/50 text-foreground placeholder-foreground/40 transition-all duration-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent/30 hover:border-primary/40 ${validationErrors.email
                     ? 'border-destructive focus:border-destructive'
                     : 'border-primary/20 focus:border-accent'
-                }`}
+                  }`}
               />
               {validationErrors.email && (
                 <p className="text-destructive text-xs mt-1">{validationErrors.email}</p>
@@ -156,11 +162,10 @@ export default function SignUpPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className={`w-full px-4 py-3 rounded-lg border-2 bg-white/50 text-foreground placeholder-foreground/40 transition-all duration-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent/30 hover:border-primary/40 ${
-                  validationErrors.password
+                className={`w-full px-4 py-3 rounded-lg border-2 bg-white/50 text-foreground placeholder-foreground/40 transition-all duration-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent/30 hover:border-primary/40 ${validationErrors.password
                     ? 'border-destructive focus:border-destructive'
                     : 'border-primary/20 focus:border-accent'
-                }`}
+                  }`}
               />
               {validationErrors.password && (
                 <p className="text-destructive text-xs mt-1">{validationErrors.password}</p>
@@ -178,11 +183,10 @@ export default function SignUpPage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
-                className={`w-full px-4 py-3 rounded-lg border-2 bg-white/50 text-foreground placeholder-foreground/40 transition-all duration-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent/30 hover:border-primary/40 ${
-                  validationErrors.confirmPassword
+                className={`w-full px-4 py-3 rounded-lg border-2 bg-white/50 text-foreground placeholder-foreground/40 transition-all duration-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-accent/30 hover:border-primary/40 ${validationErrors.confirmPassword
                     ? 'border-destructive focus:border-destructive'
                     : 'border-primary/20 focus:border-accent'
-                }`}
+                  }`}
               />
               {validationErrors.confirmPassword && (
                 <p className="text-destructive text-xs mt-1">{validationErrors.confirmPassword}</p>
@@ -200,18 +204,16 @@ export default function SignUpPage() {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-3 rounded-lg font-bold text-white transition-all duration-300 transform hover:scale-105 active:scale-95 relative overflow-hidden group ${
-                loading
+              className={`w-full py-3 rounded-lg font-bold text-white transition-all duration-300 transform hover:scale-105 active:scale-95 relative overflow-hidden group ${loading
                   ? 'bg-accent/70 cursor-not-allowed'
                   : 'bg-gradient-to-r from-primary to-secondary hover:shadow-lg'
-              } animate-fade-in-up`}
+                } animate-fade-in-up`}
               style={{ animationDelay: '0.25s' }}
             >
-              {/* Button shimmer effect */}
               {!loading && (
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent transform -skew-x-12 group-hover:translate-x-full transition-transform duration-500" />
               )}
-              
+
               <span className="relative flex items-center justify-center gap-2">
                 {loading && (
                   <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
@@ -231,16 +233,16 @@ export default function SignUpPage() {
             <div className="flex-1 h-px bg-gradient-to-l from-transparent to-primary/20" />
           </div>
 
-          {/* Login Link */}
+          {/* Login Button - Now with black/dark background for better visibility */}
           <div className="text-center animate-fade-in-up" style={{ animationDelay: '0.35s' }}>
-            <p className="text-foreground/70">
-              Already have an account?{' '}
-              <Link
-                href="/auth/login"
-                className="font-bold text-accent hover:text-accent/80 transition-colors duration-300 underline decoration-accent/30 hover:decoration-accent"
-              >
-                Sign in
-              </Link>
+            <Link
+              href="/auth/login"
+              className="inline-block w-full py-3 px-6 rounded-lg font-bold text-white bg-black hover:bg-gray-900 transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg border border-gray-700"
+            >
+              Sign In to Existing Account
+            </Link>
+            <p className="mt-3 text-sm text-foreground/60">
+              Already have an account? Just click above to log in.
             </p>
           </div>
         </div>
