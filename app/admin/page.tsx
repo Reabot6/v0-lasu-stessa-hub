@@ -6,7 +6,7 @@ import { Navigation } from '@/components/navigation';
 import { SupabaseStatus } from '@/components/supabase-status';
 import { FileUpload } from '@/components/file-upload';
 import {
-  getCourses, getResources, getNews, isAdminLoggedIn,
+  getCourses, getResources, getNews,
   Course, Resource, NewsItem,
   addCourse, updateCourse, deleteCourse,
   addResource, updateResource, deleteResource,

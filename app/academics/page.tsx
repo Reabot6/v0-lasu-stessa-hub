@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Navigation } from '@/components/navigation';
 import { ModuleLoading } from '@/components/module-loading';
-import { getCourses, Course, isAdminLoggedIn } from '@/lib/storage';
+import { getCourses, Course } from '@/lib/storage';
 import Link from 'next/link';
 
 export default function AcademicsPage() {
