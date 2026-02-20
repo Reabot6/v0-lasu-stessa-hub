@@ -25,7 +25,6 @@ export default function AcademicsPage() {
     };
 
     fetchCourses();
-    setIsAdmin(isAdminLoggedIn());
   }, []);
 
   const filteredCourses = courses.filter(

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 import { Navigation } from '@/components/navigation';
 import { SupabaseStatus } from '@/components/supabase-status';
 import { FileUpload } from '@/components/file-upload';
@@ -17,6 +18,7 @@ type Tab = 'courses' | 'resources' | 'news';
 
 export default function AdminPage() {
   const router = useRouter();
+  const supabase = createClient();
   const [activeTab, setActiveTab] = useState<Tab>('courses');
   const [courses, setCourses] = useState<Course[]>([]);
   const [resources, setResources] = useState<Resource[]>([]);
@@ -36,13 +38,17 @@ export default function AdminPage() {
   const [newsForm, setNewsForm] = useState<Partial<NewsItem>>({});
 
   useEffect(() => {
-    if (!isAdminLoggedIn()) {
-      router.push('/admin/login');
-      return;
-    }
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session || session.user?.user_metadata?.role !== 'admin') {
+        router.push('/admin/login');
+        return;
+      }
+      loadData();
+    };
 
-    loadData();
-  }, [router]);
+    checkAuth();
+  }, [router, supabase.auth]);
 
   const loadData = async () => {
     try {

@@ -28,7 +28,6 @@ export default function ResourcesPage() {
     };
 
     fetchData();
-    isAdminLoggedIn();
   }, []);
 
   if (loading) {
