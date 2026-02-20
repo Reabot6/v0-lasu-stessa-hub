@@ -122,13 +122,13 @@ export const uploadResourceFile = async (
     const fileName = `${courseId}/${timestamp}-${file.name}`;
 
     const { data, error } = await supabase.storage
-      .from('resources')
+      .from('uploads')  // ← fixed bucket name (your bucket is 'uploads', not 'resources')
       .upload(fileName, file, { cacheControl: '3600', upsert: false });
 
     if (error) throw error;
 
     const { data: publicUrlData } = supabase.storage
-      .from('resources')
+      .from('uploads')
       .getPublicUrl(fileName);
 
     return {
@@ -145,7 +145,7 @@ export const uploadResourceFile = async (
 export const deleteResourceFile = async (filePath: string): Promise<boolean> => {
   try {
     const { error } = await supabase.storage
-      .from('resources')
+      .from('uploads')  // ← fixed bucket name
       .remove([filePath]);
 
     if (error) throw error;
