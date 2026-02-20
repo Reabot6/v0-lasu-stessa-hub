@@ -48,67 +48,6 @@ export interface NewsItem {
   updated_at?: string;
 }
 
-const FALLBACK_COURSES: Course[] = [
-  {
-    id: '1',
-    title: 'Introduction to Computer Science',
-    department: 'Computer Science',
-    description: 'Fundamentals of programming and computer systems',
-    code: 'CS101',
-  },
-  {
-    id: '2',
-    title: 'Data Structures',
-    department: 'Computer Science',
-    description: 'Advanced data structures and algorithms',
-    code: 'CS201',
-  },
-  {
-    id: '3',
-    title: 'Software Engineering',
-    department: 'Computer Science',
-    description: 'Software development methodologies and practices',
-    code: 'CS301',
-  },
-];
-
-const FALLBACK_RESOURCES: Resource[] = [
-  {
-    id: '1',
-    title: 'Python Basics Tutorial',
-    course_id: '1',
-    type: 'video',
-    url: 'https://example.com/python',
-    description: 'Learn Python fundamentals',
-  },
-  {
-    id: '2',
-    title: 'DSA Study Guide',
-    course_id: '2',
-    type: 'pdf',
-    url: 'https://example.com/dsa',
-    description: 'Comprehensive data structures guide',
-  },
-  {
-    id: '3',
-    title: 'Software Engineering Handbook',
-    course_id: '3',
-    type: 'document',
-    url: 'https://example.com/se',
-    description: 'Best practices and methodologies',
-  },
-];
-
-const FALLBACK_NEWS: NewsItem[] = [
-  {
-    id: '1',
-    title: 'Welcome to STESSA',
-    content: 'Welcome to the Science, Technology, Engineering and Skills Services for Africa program. This is your hub for accessing all educational resources and updates.',
-    date: new Date().toISOString().split('T')[0],
-    author: 'Admin',
-  },
-];
-
 export const initializeStorage = () => {
   console.log('[v0] Storage initialized');
 };
