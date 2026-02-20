@@ -5,7 +5,7 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 const isConfigured = !!(supabaseUrl && supabaseKey);
 
-console.log('[v0] Supabase url:', supabaseUrl ? '✓ Set' : '✗ NOT SET');
+console.log('[v0] Supabase URL:', supabaseUrl ? '✓ Set' : '✗ NOT SET');
 console.log('[v0] Supabase Key:', supabaseKey ? '✓ Set' : '✗ NOT SET');
 
 if (!isConfigured) {
@@ -29,10 +29,9 @@ export interface Resource {
   id: string;
   title: string;
   course_id: string;
-  type: string;          // matches SQL column "type"
-  url: string;           // internal storage path (NOT NULL)
-  file_url?: string;     // public URL
-  description?: string;
+  type: string;
+  url: string;
+  description: string;
   file_name?: string;
   file_size?: number;
   created_at?: string;
@@ -49,6 +48,67 @@ export interface NewsItem {
   updated_at?: string;
 }
 
+const FALLBACK_COURSES: Course[] = [
+  {
+    id: '1',
+    title: 'Introduction to Computer Science',
+    department: 'Computer Science',
+    description: 'Fundamentals of programming and computer systems',
+    code: 'CS101',
+  },
+  {
+    id: '2',
+    title: 'Data Structures',
+    department: 'Computer Science',
+    description: 'Advanced data structures and algorithms',
+    code: 'CS201',
+  },
+  {
+    id: '3',
+    title: 'Software Engineering',
+    department: 'Computer Science',
+    description: 'Software development methodologies and practices',
+    code: 'CS301',
+  },
+];
+
+const FALLBACK_RESOURCES: Resource[] = [
+  {
+    id: '1',
+    title: 'Python Basics Tutorial',
+    course_id: '1',
+    type: 'video',
+    url: 'https://example.com/python',
+    description: 'Learn Python fundamentals',
+  },
+  {
+    id: '2',
+    title: 'DSA Study Guide',
+    course_id: '2',
+    type: 'pdf',
+    url: 'https://example.com/dsa',
+    description: 'Comprehensive data structures guide',
+  },
+  {
+    id: '3',
+    title: 'Software Engineering Handbook',
+    course_id: '3',
+    type: 'document',
+    url: 'https://example.com/se',
+    description: 'Best practices and methodologies',
+  },
+];
+
+const FALLBACK_NEWS: NewsItem[] = [
+  {
+    id: '1',
+    title: 'Welcome to STESSA',
+    content: 'Welcome to the Science, Technology, Engineering and Skills Services for Africa program. This is your hub for accessing all educational resources and updates.',
+    date: new Date().toISOString().split('T')[0],
+    author: 'Admin',
+  },
+];
+
 export const initializeStorage = () => {
   console.log('[v0] Storage initialized');
 };
@@ -56,29 +116,23 @@ export const initializeStorage = () => {
 export const uploadResourceFile = async (
   file: File,
   courseId: string
-): Promise<{
-  path: string;        // internal storage path
-  publicUrl: string;   // public URL
-  fileName: string;
-  fileSize: number;
-} | null> => {
+): Promise<{ url: string; fileName: string; fileSize: number } | null> => {
   try {
     const timestamp = Date.now();
-    const path = `${courseId}/${timestamp}-${file.name}`;
+    const fileName = `${courseId}/${timestamp}-${file.name}`;
 
-    const { error: uploadError } = await supabase.storage
+    const { data, error } = await supabase.storage
+      .from('uploads')  // ← fixed bucket name (your bucket is 'uploads', not 'resources')
+      .upload(fileName, file, { cacheControl: '3600', upsert: false });
+
+    if (error) throw error;
+
+    const { data: publicUrlData } = supabase.storage
       .from('uploads')
-      .upload(path, file, { cacheControl: '3600', upsert: false });
-
-    if (uploadError) throw uploadError;
-
-    const { data } = supabase.storage
-      .from('uploads')
-      .getPublicUrl(path);
+      .getPublicUrl(fileName);
 
     return {
-      path,
-      publicUrl: data.publicUrl,
+      url: publicUrlData.publicUrl,
       fileName: file.name,
       fileSize: file.size,
     };
@@ -245,37 +299,15 @@ export const getResourcesByCourse = async (
 };
 
 export const addResource = async (
-  file: File,
-  payload: {
-    title: string;
-    course_id: string;
-    type: string;
-    description?: string;
-  }
+  resource: Omit<Resource, 'id' | 'created_at' | 'updated_at'>
 ): Promise<Resource | null> => {
   try {
-    // 1️⃣ Upload file
-    const upload = await uploadResourceFile(file, payload.course_id);
-    if (!upload) throw new Error('File upload failed');
-
-    // 2️⃣ Insert DB row with url (NOT NULL) and file_url
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('resources')
-      .insert({
-        title: payload.title,
-        course_id: payload.course_id,
-        type: payload.type,
-        url: upload.path,           // REQUIRED (NOT NULL)
-        file_url: upload.publicUrl, // public URL
-        description: payload.description,
-        file_name: upload.fileName,
-        file_size: upload.fileSize,
-      })
-      .select()
-      .maybeSingle();
+      .insert(resource);
 
     if (error) throw error;
-    return data as Resource;
+    return resource as Resource;
   } catch (error) {
     console.error('[v0] Error adding resource:', error);
     return null;
@@ -302,22 +334,17 @@ export const updateResource = async (
   }
 };
 
-export const deleteResource = async (resource: Resource): Promise<boolean> => {
+export const deleteResource = async (id: string): Promise<boolean> => {
   try {
-    // 1️⃣ Delete storage file using internal path
-    if (resource.url) {
-      await supabase.storage
-        .from('uploads')
-        .remove([resource.url]);
+    const { error } = await supabase.from('resources').delete().eq('id', id);
+    if (error) {
+      console.error('[v0] Error deleting resource:', {
+        code: error.code,
+        message: error.message,
+        status: (error as any).status,
+      });
+      throw error;
     }
-
-    // 2️⃣ Delete DB row
-    const { error } = await supabase
-      .from('resources')
-      .delete()
-      .eq('id', resource.id);
-
-    if (error) throw error;
     return true;
   } catch (error: any) {
     console.error('[v0] Failed to delete resource:', error?.message || 'Unknown error');

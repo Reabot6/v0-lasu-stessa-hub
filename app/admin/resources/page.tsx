@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { uploadFile } from '@/lib/storage-utils';
 import { AdminHeader } from '@/components/admin-header';
-import { addResource, deleteResource } from '@/lib/storage';
 
 export default function AdminResourcesPage() {
   const supabase = createClient();
@@ -75,23 +74,23 @@ export default function AdminResourcesPage() {
           title: formData.title,
           description: formData.description,
           course_id: formData.course_id || null,
-          type: formData.resource_type,
+          resource_type: formData.resource_type,
+          file_url: fileUrl,
           updated_at: new Date().toISOString(),
         }).eq('id', editingId);
         if (error) alert('Failed to update resource: ' + error.message);
         else alert('Resource updated successfully!');
-      } else if (file) {
-        // Use the corrected addResource function that handles upload + insert
-        const result = await addResource(file, {
-          title: formData.title,
-          course_id: formData.course_id || '',
-          type: formData.resource_type,
-          description: formData.description,
-        });
-        if (result) alert('Resource created successfully!');
-        else alert('Failed to create resource');
       } else {
-        alert('Please select a file');
+        const { error } = await supabase.from('resources').insert({
+          title: formData.title,
+          description: formData.description,
+          course_id: formData.course_id || null,
+          resource_type: formData.resource_type,
+          file_url: fileUrl,
+          created_by: user.id,
+        });
+        if (error) alert('Failed to create resource: ' + error.message);
+        else alert('Resource created successfully!');
       }
       handleCancelEdit();
       fetchResources();
@@ -103,15 +102,14 @@ export default function AdminResourcesPage() {
     }
   };
 
-  const handleDelete = async (resource: any) => {
+  const handleDelete = async (id: string) => {
     if (!confirm('Delete this resource?')) return;
     try {
-      const success = await deleteResource(resource);
-      if (success) {
+      const { error } = await supabase.from('resources').delete().eq('id', id);
+      if (error) alert('Failed to delete');
+      else {
         alert('Resource deleted successfully');
         fetchResources();
-      } else {
-        alert('Failed to delete resource');
       }
     } catch (error) {
       console.error('Delete error:', error);
@@ -125,7 +123,7 @@ export default function AdminResourcesPage() {
       title: item.title,
       description: item.description || '',
       course_id: item.course_id || '',
-      resource_type: item.type || 'pdf',
+      resource_type: item.resource_type || 'pdf',
     });
     if (item.file_url) setPreviewFile(item.file_url);
     setShowForm(true);
