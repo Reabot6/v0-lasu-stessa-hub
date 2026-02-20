@@ -56,23 +56,29 @@ export const initializeStorage = () => {
 export const uploadResourceFile = async (
   file: File,
   courseId: string
-): Promise<{ file_url: string; fileName: string; fileSize: number } | null> => {
+): Promise<{
+  path: string;        // internal storage path
+  publicUrl: string;   // public URL
+  fileName: string;
+  fileSize: number;
+} | null> => {
   try {
     const timestamp = Date.now();
-    const fileName = `${courseId}/${timestamp}-${file.name}`;
+    const path = `${courseId}/${timestamp}-${file.name}`;
 
-    const { data, error } = await supabase.storage
-      .from('uploads')  // ← fixed bucket name (your bucket is 'uploads', not 'resources')
-      .upload(fileName, file, { cacheControl: '3600', upsert: false });
-
-    if (error) throw error;
-
-    const { data: publicUrlData } = supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('uploads')
-      .getPublicUrl(fileName);
+      .upload(path, file, { cacheControl: '3600', upsert: false });
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabase.storage
+      .from('uploads')
+      .getPublicUrl(path);
 
     return {
-      file_url: publicUrlData.publicUrl,
+      path,
+      publicUrl: data.publicUrl,
       fileName: file.name,
       fileSize: file.size,
     };
@@ -239,15 +245,37 @@ export const getResourcesByCourse = async (
 };
 
 export const addResource = async (
-  resource: Omit<Resource, 'id' | 'created_at' | 'updated_at'>
+  file: File,
+  payload: {
+    title: string;
+    course_id: string;
+    type: string;
+    description?: string;
+  }
 ): Promise<Resource | null> => {
   try {
-    const { error } = await supabase
+    // 1️⃣ Upload file
+    const upload = await uploadResourceFile(file, payload.course_id);
+    if (!upload) throw new Error('File upload failed');
+
+    // 2️⃣ Insert DB row with url (NOT NULL) and file_url
+    const { data, error } = await supabase
       .from('resources')
-      .insert(resource);
+      .insert({
+        title: payload.title,
+        course_id: payload.course_id,
+        type: payload.type,
+        url: upload.path,           // REQUIRED (NOT NULL)
+        file_url: upload.publicUrl, // public URL
+        description: payload.description,
+        file_name: upload.fileName,
+        file_size: upload.fileSize,
+      })
+      .select()
+      .maybeSingle();
 
     if (error) throw error;
-    return resource as Resource;
+    return data as Resource;
   } catch (error) {
     console.error('[v0] Error adding resource:', error);
     return null;
@@ -274,17 +302,22 @@ export const updateResource = async (
   }
 };
 
-export const deleteResource = async (id: string): Promise<boolean> => {
+export const deleteResource = async (resource: Resource): Promise<boolean> => {
   try {
-    const { error } = await supabase.from('resources').delete().eq('id', id);
-    if (error) {
-      console.error('[v0] Error deleting resource:', {
-        code: error.code,
-        message: error.message,
-        status: (error as any).status,
-      });
-      throw error;
+    // 1️⃣ Delete storage file using internal path
+    if (resource.url) {
+      await supabase.storage
+        .from('uploads')
+        .remove([resource.url]);
     }
+
+    // 2️⃣ Delete DB row
+    const { error } = await supabase
+      .from('resources')
+      .delete()
+      .eq('id', resource.id);
+
+    if (error) throw error;
     return true;
   } catch (error: any) {
     console.error('[v0] Failed to delete resource:', error?.message || 'Unknown error');

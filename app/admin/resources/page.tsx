@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { uploadFile } from '@/lib/storage-utils';
 import { AdminHeader } from '@/components/admin-header';
+import { addResource, deleteResource } from '@/lib/storage';
 
 export default function AdminResourcesPage() {
   const supabase = createClient();
@@ -75,22 +76,22 @@ export default function AdminResourcesPage() {
           description: formData.description,
           course_id: formData.course_id || null,
           type: formData.resource_type,
-          file_url: fileUrl,
           updated_at: new Date().toISOString(),
         }).eq('id', editingId);
         if (error) alert('Failed to update resource: ' + error.message);
         else alert('Resource updated successfully!');
-      } else {
-        const { error } = await supabase.from('resources').insert({
+      } else if (file) {
+        // Use the corrected addResource function that handles upload + insert
+        const result = await addResource(file, {
           title: formData.title,
-          description: formData.description,
-          course_id: formData.course_id || null,
+          course_id: formData.course_id || '',
           type: formData.resource_type,
-          url: fileUrl,
-          file_url: fileUrl,
+          description: formData.description,
         });
-        if (error) alert('Failed to create resource: ' + error.message);
-        else alert('Resource created successfully!');
+        if (result) alert('Resource created successfully!');
+        else alert('Failed to create resource');
+      } else {
+        alert('Please select a file');
       }
       handleCancelEdit();
       fetchResources();
@@ -102,14 +103,15 @@ export default function AdminResourcesPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (resource: any) => {
     if (!confirm('Delete this resource?')) return;
     try {
-      const { error } = await supabase.from('resources').delete().eq('id', id);
-      if (error) alert('Failed to delete');
-      else {
+      const success = await deleteResource(resource);
+      if (success) {
         alert('Resource deleted successfully');
         fetchResources();
+      } else {
+        alert('Failed to delete resource');
       }
     } catch (error) {
       console.error('Delete error:', error);
