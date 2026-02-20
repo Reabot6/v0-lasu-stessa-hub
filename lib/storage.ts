@@ -5,7 +5,7 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 const isConfigured = !!(supabaseUrl && supabaseKey);
 
-console.log('[v0] Supabase URL:', supabaseUrl ? '✓ Set' : '✗ NOT SET');
+console.log('[v0] Supabase url:', supabaseUrl ? '✓ Set' : '✗ NOT SET');
 console.log('[v0] Supabase Key:', supabaseKey ? '✓ Set' : '✗ NOT SET');
 
 if (!isConfigured) {
@@ -30,7 +30,7 @@ export interface Resource {
   title: string;
   course_id: string;
   type: string;
-  url: string;
+  file_url: string;
   description: string;
   file_name?: string;
   file_size?: number;
@@ -55,7 +55,7 @@ export const initializeStorage = () => {
 export const uploadResourceFile = async (
   file: File,
   courseId: string
-): Promise<{ url: string; fileName: string; fileSize: number } | null> => {
+): Promise<{ file_url: string; fileName: string; fileSize: number } | null> => {
   try {
     const timestamp = Date.now();
     const fileName = `${courseId}/${timestamp}-${file.name}`;
@@ -71,7 +71,7 @@ export const uploadResourceFile = async (
       .getPublicUrl(fileName);
 
     return {
-      url: publicUrlData.publicUrl,
+      file_url: publicUrlData.publicUrl,
       fileName: file.name,
       fileSize: file.size,
     };
