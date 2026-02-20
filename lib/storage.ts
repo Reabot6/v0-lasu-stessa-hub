@@ -447,31 +447,3 @@ export const deleteNews = async (id: string): Promise<boolean> => {
   }
 };
 
-export const verifyAdmin = async (
-  email: string,
-  password: string
-): Promise<boolean> => {
-  if (email === 'stessaedu@gmail.com' && password === 'admin123stessa') {
-    return true;
-  }
-  return false;
-};
-
-export const setAdminSession = (token: string): void => {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem('stessa_admin_session', token);
-};
-
-export const getAdminSession = (): string | null => {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('stessa_admin_session');
-};
-
-export const clearAdminSession = (): void => {
-  if (typeof window === 'undefined') return;
-  localStorage.removeItem('stessa_admin_session');
-};
-
-export const isAdminLoggedIn = (): boolean => {
-  return !!getAdminSession();
-};
