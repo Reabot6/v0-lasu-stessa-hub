@@ -197,14 +197,12 @@ export const addCourse = async (
   course: Omit<Course, 'id' | 'created_at' | 'updated_at'>
 ): Promise<Course | null> => {
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('courses')
-      .insert([course])
-      .select()
-      .maybeSingle();
+      .insert(course);
 
     if (error) throw error;
-    return data as Course;
+    return course as Course;
   } catch (error) {
     console.error('[v0] Error adding course:', error);
     return null;
@@ -304,14 +302,12 @@ export const addResource = async (
   resource: Omit<Resource, 'id' | 'created_at' | 'updated_at'>
 ): Promise<Resource | null> => {
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('resources')
-      .insert([resource])
-      .select()
-      .maybeSingle();
+      .insert(resource);
 
     if (error) throw error;
-    return data as Resource;
+    return resource as Resource;
   } catch (error) {
     console.error('[v0] Error adding resource:', error);
     return null;
@@ -401,14 +397,12 @@ export const addNews = async (
   news: Omit<NewsItem, 'id' | 'created_at' | 'updated_at'>
 ): Promise<NewsItem | null> => {
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('news')
-      .insert([news])
-      .select()
-      .maybeSingle();
+      .insert(news);
 
     if (error) throw error;
-    return data as NewsItem;
+    return news as NewsItem;
   } catch (error) {
     console.error('[v0] Error adding news:', error);
     return null;
