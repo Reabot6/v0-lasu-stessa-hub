@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Navigation } from '@/components/navigation';
 import { ModuleLoading } from '@/components/module-loading';
-import { getNews, NewsItem, isAdminLoggedIn } from '@/lib/storage';
+import { getNews, NewsItem } from '@/lib/storage';
 
 export default function NewsPage() {
   const [news, setNews] = useState<NewsItem[]>([]);

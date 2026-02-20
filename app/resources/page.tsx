@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Navigation } from '@/components/navigation';
 import { ResourcesContent } from '@/components/resources-content';
 import { ModuleLoading } from '@/components/module-loading';
-import { getResources, getCourses, Resource, Course, isAdminLoggedIn } from '@/lib/storage';
+import { getResources, getCourses, Resource, Course } from '@/lib/storage';
 
 export default function ResourcesPage() {
   const [resources, setResources] = useState<Resource[]>([]);
