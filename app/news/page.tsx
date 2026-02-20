@@ -24,7 +24,6 @@ export default function NewsPage() {
     };
 
     fetchNews();
-    setIsAdmin(isAdminLoggedIn());
   }, []);
 
   const filteredNews = news.filter(
