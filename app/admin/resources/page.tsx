@@ -74,7 +74,7 @@ export default function AdminResourcesPage() {
           title: formData.title,
           description: formData.description,
           course_id: formData.course_id || null,
-          resource_type: formData.resource_type,
+          type: formData.resource_type,
           file_url: fileUrl,
           updated_at: new Date().toISOString(),
         }).eq('id', editingId);
@@ -85,9 +85,9 @@ export default function AdminResourcesPage() {
           title: formData.title,
           description: formData.description,
           course_id: formData.course_id || null,
-          resource_type: formData.resource_type,
+          type: formData.resource_type,
+          url: fileUrl,
           file_url: fileUrl,
-          created_by: user.id,
         });
         if (error) alert('Failed to create resource: ' + error.message);
         else alert('Resource created successfully!');
@@ -123,7 +123,7 @@ export default function AdminResourcesPage() {
       title: item.title,
       description: item.description || '',
       course_id: item.course_id || '',
-      resource_type: item.resource_type || 'pdf',
+      resource_type: item.type || 'pdf',
     });
     if (item.file_url) setPreviewFile(item.file_url);
     setShowForm(true);

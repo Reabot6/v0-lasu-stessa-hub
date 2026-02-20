@@ -28,11 +28,13 @@ export interface Course {
 export interface Resource {
   id: string;
   title: string;
-  description: string;
-  course_id?: string;
-  resource_type: string;
-  file_url: string;
-  created_by: string;
+  course_id: string;
+  type: string;          // matches SQL column "type"
+  url: string;           // internal storage path (NOT NULL)
+  file_url?: string;     // public URL
+  description?: string;
+  file_name?: string;
+  file_size?: number;
   created_at?: string;
   updated_at?: string;
 }
@@ -41,10 +43,8 @@ export interface NewsItem {
   id: string;
   title: string;
   content: string;
+  date: string;
   author: string;
-  published: boolean;
-  image_url?: string;
-  created_by: string;
   created_at?: string;
   updated_at?: string;
 }

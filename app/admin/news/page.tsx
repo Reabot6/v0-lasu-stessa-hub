@@ -80,8 +80,6 @@ export default function AdminNewsPage() {
           title: formData.title,
           content: formData.content,
           author: formData.author,
-          published: formData.published,
-          image_url: imageUrl,
           updated_at: new Date().toISOString(),
         }).eq('id', editingId);
         if (error) alert('Failed to update news: ' + error.message);
@@ -91,9 +89,7 @@ export default function AdminNewsPage() {
           title: formData.title,
           content: formData.content,
           author: formData.author,
-          published: formData.published,
-          image_url: imageUrl,
-          created_by: user.id,
+          date: new Date().toISOString(),
         });
         if (error) alert('Failed to create news: ' + error.message);
         else alert('News created successfully!');
