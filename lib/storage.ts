@@ -122,13 +122,13 @@ export const uploadResourceFile = async (
     const fileName = `${courseId}/${timestamp}-${file.name}`;
 
     const { data, error } = await supabase.storage
-      .from('resources')
+      .from('uploads')  // ← fixed bucket name (your bucket is 'uploads', not 'resources')
       .upload(fileName, file, { cacheControl: '3600', upsert: false });
 
     if (error) throw error;
 
     const { data: publicUrlData } = supabase.storage
-      .from('resources')
+      .from('uploads')
       .getPublicUrl(fileName);
 
     return {
@@ -145,7 +145,7 @@ export const uploadResourceFile = async (
 export const deleteResourceFile = async (filePath: string): Promise<boolean> => {
   try {
     const { error } = await supabase.storage
-      .from('resources')
+      .from('uploads')  // ← fixed bucket name
       .remove([filePath]);
 
     if (error) throw error;
@@ -197,14 +197,12 @@ export const addCourse = async (
   course: Omit<Course, 'id' | 'created_at' | 'updated_at'>
 ): Promise<Course | null> => {
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('courses')
-      .insert([course])
-      .select()
-      .maybeSingle();
+      .insert(course);
 
     if (error) throw error;
-    return data as Course;
+    return course as Course;
   } catch (error) {
     console.error('[v0] Error adding course:', error);
     return null;
@@ -304,14 +302,12 @@ export const addResource = async (
   resource: Omit<Resource, 'id' | 'created_at' | 'updated_at'>
 ): Promise<Resource | null> => {
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('resources')
-      .insert([resource])
-      .select()
-      .maybeSingle();
+      .insert(resource);
 
     if (error) throw error;
-    return data as Resource;
+    return resource as Resource;
   } catch (error) {
     console.error('[v0] Error adding resource:', error);
     return null;
@@ -401,14 +397,12 @@ export const addNews = async (
   news: Omit<NewsItem, 'id' | 'created_at' | 'updated_at'>
 ): Promise<NewsItem | null> => {
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('news')
-      .insert([news])
-      .select()
-      .maybeSingle();
+      .insert(news);
 
     if (error) throw error;
-    return data as NewsItem;
+    return news as NewsItem;
   } catch (error) {
     console.error('[v0] Error adding news:', error);
     return null;
@@ -453,31 +447,3 @@ export const deleteNews = async (id: string): Promise<boolean> => {
   }
 };
 
-export const verifyAdmin = async (
-  email: string,
-  password: string
-): Promise<boolean> => {
-  if (email === 'stessaedu@gmail.com' && password === 'admin123stessa') {
-    return true;
-  }
-  return false;
-};
-
-export const setAdminSession = (token: string): void => {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem('stessa_admin_session', token);
-};
-
-export const getAdminSession = (): string | null => {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('stessa_admin_session');
-};
-
-export const clearAdminSession = (): void => {
-  if (typeof window === 'undefined') return;
-  localStorage.removeItem('stessa_admin_session');
-};
-
-export const isAdminLoggedIn = (): boolean => {
-  return !!getAdminSession();
-};

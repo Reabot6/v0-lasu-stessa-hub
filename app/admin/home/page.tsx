@@ -52,6 +52,13 @@ export default function AdminHome() {
     );
   }
 
+  const handleLogout = async () => {
+    if (confirm('Are you sure you want to logout?')) {
+      await supabase.auth.signOut();
+      router.push('/admin/login');
+    }
+  };
+
   const adminSections = [
     { title: 'Dashboard', href: '/admin/dashboard', icon: '📊' },
     { title: 'News Management', href: '/admin/news', icon: '📰' },
@@ -73,9 +80,15 @@ export default function AdminHome() {
               <p className="text-sm text-gray-600">Welcome back, {adminName}!</p>
             </div>
             <div className="flex items-center gap-4">
-              <Link href="/admin/dashboard" className="text-primary hover:text-accent transition-colors">
+              <Link href="/admin/dashboard" className="px-3 py-2 rounded-lg text-primary hover:bg-accent/10 transition-colors font-medium">
                 Dashboard
               </Link>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 rounded-lg bg-destructive text-white font-medium text-sm hover:bg-destructive/90 transition transform hover:scale-105 active:scale-95"
+              >
+                Logout
+              </button>
             </div>
           </div>
         </div>

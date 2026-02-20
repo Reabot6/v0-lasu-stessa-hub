@@ -119,19 +119,17 @@ export default function AdminFacultyPage() {
       } else {
         const { error: insertError } = await supabase
           .from('faculty')
-          .insert([
-            {
-              name: formData.name,
-              email: formData.email,
-              phone: formData.phone,
-              specialization: formData.specialization,
-              office_location: formData.office_location,
-              office_hours: formData.office_hours,
-              bio: formData.bio,
-              image_url: imageUrl,
-              created_by: user.id,
-            },
-          ]);
+          .insert({
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            specialization: formData.specialization,
+            office_location: formData.office_location,
+            office_hours: formData.office_hours,
+            bio: formData.bio,
+            image_url: imageUrl,
+            created_by: user.id,
+          });
 
         if (insertError) {
           console.error('Insert error:', insertError);
