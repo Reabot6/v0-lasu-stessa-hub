@@ -28,12 +28,11 @@ export interface Course {
 export interface Resource {
   id: string;
   title: string;
-  course_id: string;
-  type: string;
-  file_url: string;
   description: string;
-  file_name?: string;
-  file_size?: number;
+  course_id?: string;
+  resource_type: string;
+  file_url: string;
+  created_by: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -42,8 +41,10 @@ export interface NewsItem {
   id: string;
   title: string;
   content: string;
-  date: string;
   author: string;
+  published: boolean;
+  image_url?: string;
+  created_by: string;
   created_at?: string;
   updated_at?: string;
 }
